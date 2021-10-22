@@ -1,0 +1,28 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bgcolor);
+  color: var(--font-color);
+}
+
+:root {
+  --bgcolor: #fff;
+  --font-color: #707070;
+  --line-color: #f2f2f2;
+  --container-color1: mediumaquamarine;
+  --container-color2: #f2f2f2;
+}
+
+[display-mode="dark"] {
+  --bgcolor: #0a1931;
+  --font-color: #eee;
+  --line-color: #0a1931;
+  --container-color1: #0f2444;
+  --container-color2: #0f2444;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
