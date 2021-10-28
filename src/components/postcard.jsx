@@ -3,7 +3,7 @@ import React from 'react';
 import { postcardContainer, postcardTop, postcardBottom } from './postcard.module.css';
 
 export default function Postcard({title, description, date, tag, slug}) {
-    const pathName = window.location.pathname;
+    const pathName = typeof window !== 'undefined'?window.location.pathname:'/';
     return (
         <Link to={pathName==='/'?`post/${slug}`:`${slug}`}>
         <div className={postcardContainer}>
