@@ -12,7 +12,7 @@ export default function InfoPage() {
                     </div>
                 </div>
                 <div className={mainInfoRight}>
-                    <div>홍정기</div>
+                    <div>Jeongki</div>
                     <div>항상 끊임없이 배우는 개발자가 되고 싶습니다.</div>
                     <div>
                         <div>사용 기술</div>

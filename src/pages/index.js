@@ -9,7 +9,9 @@ export default function MainPage({ data }){
   return (
     <Layout>
       <div>
-        <div style={{width:'100%', height:'300px', backgroundColor:'var(--container-color1)'}}>main intro</div>
+        <div style={{width:'100%', height:'300px', backgroundColor:'var(--container-color1)', display: 'flex', justifyContent:'center', alignItems:'center', fontSize:'2rem'}}>
+          <strong>죽기 직전</strong>까지 배워서 채우기
+        </div>
         <div style={{width:'100%', marginTop:'50px'}}>
           <div style={{fontSize:'18px'}}>최신 포스트</div>
           <div className={postContainer}>
