@@ -31,7 +31,7 @@ export default function Page1() {
                 </div>
                 <div className={topRight}>
                     <input style={{height:'100%', outline:'none', border:'1px solid #808080', borderRadius:'5px', boxSizing:'border-box', paddingLeft:'10px', marginRight:'10px'}} type="text" placeholder="검색"/>
-                    <input style={{width:'40px', height:'100%', border:'none', cursor:'pointer', backgroundColor:'var(--button-color)', borderRadius:'5px', color:'#fff'}} type="button" value="🔍" />
+                    <input style={{width:'40px', height:'100%', border:'none', cursor:'pointer', backgroundColor:'var(--button-color)', borderRadius:'5px', color:'#fff', textAlign:'center'}} type="button" value="🔍" />
                 </div>
             </div>
             <div className={postContainer}>
