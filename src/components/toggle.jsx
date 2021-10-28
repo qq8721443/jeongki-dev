@@ -5,15 +5,17 @@ export default function Toggle() {
     const [display, setDisplay] = React.useState(localStorage.getItem('display_mode') || 'light');
     
     const handleToggleButton = () => {
-        const display_mode = localStorage.getItem('display_mode');
-        if (display_mode === 'light'){
-            localStorage.setItem('display_mode', 'dark');
-            document.documentElement.setAttribute('display-mode', 'dark');
-            setDisplay('dark');
-        } else if (display_mode === 'dark'){
-            localStorage.setItem('display_mode', 'light');
-            document.documentElement.setAttribute('display-mode', 'light');
-            setDisplay('light');
+        if (typeof window !== undefined){
+            const display_mode = localStorage.getItem('display_mode');
+            if (display_mode === 'light'){
+                localStorage.setItem('display_mode', 'dark');
+                document.documentElement.setAttribute('display-mode', 'dark');
+                setDisplay('dark');
+            } else if (display_mode === 'dark'){
+                localStorage.setItem('display_mode', 'light');
+                document.documentElement.setAttribute('display-mode', 'light');
+                setDisplay('light');
+            }
         }
     }
 
