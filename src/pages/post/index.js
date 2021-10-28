@@ -7,7 +7,7 @@ import Postcard from '../../components/postcard';
 export default function Page1() {
     const data = useStaticQuery(graphql`
     query {
-        allMdx(sort: {fields: frontmatter___date}) {
+        allMdx(sort: {fields: frontmatter___date, order:DESC}) {
           nodes {
             frontmatter {
               title

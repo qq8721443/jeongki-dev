@@ -1,9 +1,12 @@
+@import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css);
+
 html,
 body {
   margin: 0;
   padding: 0;
   background-color: var(--bgcolor);
   color: var(--font-color);
+  font-family: "Noto Sans KR";
 }
 
 :root {

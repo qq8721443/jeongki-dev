@@ -11,6 +11,7 @@ module.exports = {
         path:`${__dirname}/src/contents`
       },
     },
-    "gatsby-plugin-mdx"
+    "gatsby-plugin-mdx",
+    "gatsby-remark-reading-time"
   ],
 };

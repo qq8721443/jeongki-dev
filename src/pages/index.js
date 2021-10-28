@@ -25,7 +25,7 @@ export default function MainPage({ data }){
 
 export const query = graphql`
 query {
-  allMdx(sort: {fields: frontmatter___date}) {
+  allMdx(sort: {fields: frontmatter___date, order:DESC}) {
     nodes {
       frontmatter {
         title

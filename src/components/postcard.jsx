@@ -14,7 +14,7 @@ export default function Postcard({title, description, date, tag, slug}) {
                 <div style={{flex:1, display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                     <div>{date}</div>
                     <div>{tag.map((item, index) => (
-                        <div key={index} style={{display:'inline-block', height:'15px', color:'mediumaquamarine', padding:'0 5px', margin:'0 2px', border:'1px solid mediumaquamarine', borderRadius:'7.5px'}}>
+                        <div key={index} style={{display:'inline-block', color:'mediumaquamarine', padding:'0 5px', margin:'0 2px', border:'1px solid mediumaquamarine', borderRadius:'7.5px'}}>
                             {item}
                         </div>
                     ))}</div>
