@@ -3,5 +3,14 @@ module.exports = {
     siteUrl: "https://www.yourdomain.tld",
     title: "Jeongki Dev",
   },
-  plugins: [],
+  plugins: [
+    {
+      resolve: "gatsby-source-filesystem",
+      options: {
+        name:'contents',
+        path:`${__dirname}/src/contents`
+      },
+    },
+    "gatsby-plugin-mdx"
+  ],
 };

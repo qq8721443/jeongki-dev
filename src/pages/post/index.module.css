@@ -1,0 +1,27 @@
+.post-container {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(300px, auto));
+  column-gap: 10px;
+}
+
+.top-container {
+  position: relative;
+  display: flex;
+  height: 40px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.top-left {
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+}
+
+.top-right {
+  position: relative;
+  height: 30px;
+  display: flex;
+  align-items: center;
+}

@@ -3,8 +3,9 @@ import React from 'react';
 import Layout from '../components/layout';
 import Postcard from '../components/postcard';
 import { postContainer } from './index.module.css';
+import { graphql } from 'gatsby';
 
-export default function MainPage(){
+export default function MainPage({ data }){
   return (
     <Layout>
       <div>
@@ -12,13 +13,31 @@ export default function MainPage(){
         <div style={{width:'100%', marginTop:'50px'}}>
           <div style={{fontSize:'18px'}}>최신 포스트</div>
           <div className={postContainer}>
-            <Postcard />
-            <Postcard />
-            <Postcard />
-            <Postcard />
+            {data.allMdx.nodes.map(item => (
+                <Postcard key={item.id} title={item.frontmatter.title} description={item.frontmatter.description} date={item.frontmatter.date} tag={item.frontmatter.tag} slug={item.fields.slug}/>
+            ))}
           </div>
         </div>
       </div>
     </Layout>
   )
 }
+
+export const query = graphql`
+query {
+  allMdx(sort: {fields: frontmatter___date}) {
+    nodes {
+      frontmatter {
+        title
+        date(formatString: "YYYY-MM-DD")
+        tag
+        description
+      }
+      id
+      fields {
+        slug
+      }
+    }
+  }
+}
+`

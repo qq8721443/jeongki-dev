@@ -69,10 +69,8 @@
 }
 
 @media screen and (max-width: 1000px) {
-  .main-content {
-    width: 95%;
-  }
+  .main-content,
   .inside-nav {
-    width: 95%;
+    width: 98%;
   }
 }

@@ -12,6 +12,8 @@ body {
   --line-color: #f2f2f2;
   --container-color1: mediumaquamarine;
   --container-color2: #f2f2f2;
+  --shadow-color: gray;
+  --button-color: mediumaquamarine;
 }
 
 [display-mode="dark"] {
@@ -20,6 +22,8 @@ body {
   --line-color: #0a1931;
   --container-color1: #0f2444;
   --container-color2: #0f2444;
+  --shadow-color: black;
+  --button-color: #ffe699;
 }
 
 a {
