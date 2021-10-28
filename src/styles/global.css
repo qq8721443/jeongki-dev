@@ -1,4 +1,4 @@
-@import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css);
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap");
 
 html,
 body {
@@ -6,7 +6,7 @@ body {
   padding: 0;
   background-color: var(--bgcolor);
   color: var(--font-color);
-  font-family: "Noto Sans KR";
+  font-family: "Noto Sans KR", sans-serif;
 }
 
 :root {
