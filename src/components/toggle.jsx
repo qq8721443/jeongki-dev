@@ -2,20 +2,18 @@ import React from 'react';
 import {toggleContainer, circle} from './toggle.module.css';
 
 export default function Toggle() {
-    const [display, setDisplay] = React.useState(localStorage.getItem('display_mode') || 'light');
+    const [display, setDisplay] = React.useState(typeof window !== 'undefined'?localStorage.getItem('display_mode'):'light');
     
     const handleToggleButton = () => {
-        if (typeof window !== undefined){
-            const display_mode = localStorage.getItem('display_mode');
-            if (display_mode === 'light'){
-                localStorage.setItem('display_mode', 'dark');
-                document.documentElement.setAttribute('display-mode', 'dark');
-                setDisplay('dark');
-            } else if (display_mode === 'dark'){
-                localStorage.setItem('display_mode', 'light');
-                document.documentElement.setAttribute('display-mode', 'light');
-                setDisplay('light');
-            }
+        const display_mode = localStorage.getItem('display_mode');
+        if (display_mode === 'light'){
+            localStorage.setItem('display_mode', 'dark');
+            document.documentElement.setAttribute('display-mode', 'dark');
+            setDisplay('dark');
+        } else if (display_mode === 'dark'){
+            localStorage.setItem('display_mode', 'light');
+            document.documentElement.setAttribute('display-mode', 'light');
+            setDisplay('light');
         }
     }
 
