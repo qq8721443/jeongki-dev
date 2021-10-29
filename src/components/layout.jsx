@@ -11,7 +11,6 @@ export default function Layout({ children }){
             localStorage.setItem('display_mode', 'light');
         }
         document.documentElement.setAttribute('display-mode', localStorage.getItem('display_mode'));
-        setDisplayMode(document.documentElement.getAttribute('display-mode'));
     }, [])
     return (
         <div>
@@ -40,7 +39,7 @@ export default function Layout({ children }){
                         </div>
                     </div>
                     <div className={naviItem}>
-                            <Toggle initialState={displayMode}/>
+                            <Toggle/>
                     </div>
                 </div>
             </nav>
