@@ -2,17 +2,19 @@ import React from 'react';
 import {toggleContainer, circle} from './toggle.module.css';
 
 export default function Toggle() {
-    const [display, setDisplay] = React.useState(null);
+    const [display, setDisplay] = React.useState(document.documentElement.display_mode);
 
     React.useLayoutEffect(() => {
-        if (localStorage.getItem('display_mode') === 'light') {
-            setDisplay('light')
-        } else if (localStorage.getItem('display_mode') === 'dark') {
-            setDisplay('dark');
-        } else {
-            localStorage.setItem('display_mode', 'light');
-            setDisplay('light');
-        }
+        // if (localStorage.getItem('display_mode') === 'light') {
+        //     setDisplay('light')
+        // } else if (localStorage.getItem('display_mode') === 'dark') {
+        //     setDisplay('dark');
+        // } else {
+        //     localStorage.setItem('display_mode', 'light');
+        //     setDisplay('light');
+        // }
+        // 서버 사이드 렌더링 때문에 렌더링 할때 로컬 스토리지를 못 쓰는듯?
+
     }, [])
     
     const handleToggleButton = () => {
