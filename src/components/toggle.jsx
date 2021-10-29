@@ -32,10 +32,9 @@ export default function Toggle({ initialState }) {
     }
 
     return (
-        <div className={toggleContainer} onClick={handleToggleButton} style={display === 'light'?{backgroundColor:'mediumaquamarine'}:{backgroundColor:'#FFE699'}}>
-            <div className={circle} style={display === 'light'?{transform:'translateX(0)'}:{transform:'translateX(50px)', backgroundColor:'#0A1931'}}>
-                {display === 'light'?
-                '☀️':'🌙'}
+        <div className={toggleContainer} onClick={handleToggleButton} style={{backgroundColor:'var(--toggle-back-color)'}}>
+            <div className={circle} style={{transform:'translateX(var(--toggle-position))', backgroundColor:'var(--toggle-button-color)'}}>
+                {display === 'light'?'☀️':display === 'dark'?'🌙':undefined}
             </div>
         </div>
     )
