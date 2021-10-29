@@ -14,7 +14,7 @@ export default function Toggle() {
         //     setDisplay('light');
         // }
         // 서버 사이드 렌더링 때문에 렌더링 할때 로컬 스토리지를 못 쓰는듯?
-        setDisplay(document.documentElement.display_mode);
+        setDisplay(document.documentElement.getAttribute('display-mode'));
     })
     
     const handleToggleButton = () => {
