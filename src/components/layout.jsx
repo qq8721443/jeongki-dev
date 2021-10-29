@@ -4,7 +4,7 @@ import { navigator, insideNav, logo, menu, listItem, naviItem, mainContent, foot
 import Toggle from './toggle.jsx';
 
 export default function Layout({ children }){
-    React.useEffect(() => {
+    React.useLayoutEffect(() => {
         const displayMode = localStorage.getItem('display_mode');
         if (displayMode === null){
             localStorage.setItem('display_mode', 'light');
@@ -38,7 +38,7 @@ export default function Layout({ children }){
                         </div>
                     </div>
                     <div className={naviItem}>
-                            <Toggle/>
+                            <Toggle initialState={document.documentElement.getAttribute('display-mode')}/>
                     </div>
                 </div>
             </nav>

@@ -1,8 +1,8 @@
 import React from 'react';
 import {toggleContainer, circle} from './toggle.module.css';
 
-export default function Toggle() {
-    const [display, setDisplay] = React.useState(null);
+export default function Toggle({ initialState }) {
+    const [display, setDisplay] = React.useState(initialState);
 
     React.useEffect(() => {
         // if (localStorage.getItem('display_mode') === 'light') {
