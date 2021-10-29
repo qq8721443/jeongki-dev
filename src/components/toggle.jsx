@@ -4,7 +4,7 @@ import {toggleContainer, circle} from './toggle.module.css';
 export default function Toggle() {
     const [display, setDisplay] = React.useState(null);
 
-    React.useLayoutEffect(() => {
+    React.useEffect(() => {
         // if (localStorage.getItem('display_mode') === 'light') {
         //     setDisplay('light')
         // } else if (localStorage.getItem('display_mode') === 'dark') {
