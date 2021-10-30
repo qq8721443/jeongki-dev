@@ -1,6 +1,6 @@
 module.exports = {
   siteMetadata: {
-    siteUrl: "https://www.yourdomain.tld",
+    siteUrl: "https://jeongki.dev",
     title: "Jeongki Dev",
   },
   plugins: [
@@ -11,7 +11,26 @@ module.exports = {
         path:`${__dirname}/src/contents`
       },
     },
-    "gatsby-plugin-mdx",
-    "gatsby-remark-reading-time"
+    {
+      resolve:"gatsby-plugin-mdx",
+      options:{
+        gatsbyRemarkPlugins: [
+          {
+            resolve: "gatsby-remark-highlight-code"
+          }
+        ]
+      }
+    },
+    {
+      resolve:"gatsby-plugin-nprogress",
+      options:{
+        color: `mediumaquamarine`,
+        showSpinnner: false,
+      }
+    },
+    "gatsby-remark-reading-time",
+    "gatsby-plugin-image",
+    "gatsby-plugin-sharp",
+    "gatsby-transformer-sharp"
   ],
 };

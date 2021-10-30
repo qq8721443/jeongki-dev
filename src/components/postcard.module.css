@@ -17,9 +17,13 @@
 
 .postcard-top {
   flex: 9;
-  background-color: rgb(82, 82, 82);
+  background-color: #c6e4bb;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
 }
 
 .postcard-bottom {

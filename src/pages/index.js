@@ -16,7 +16,7 @@ export default function MainPage({ data }){
           <div style={{fontSize:'18px'}}>최신 포스트</div>
           <div className={postContainer}>
             {data.allMdx.nodes.map(item => (
-                <Postcard key={item.id} title={item.frontmatter.title} description={item.frontmatter.description} date={item.frontmatter.date} tag={item.frontmatter.tag} slug={item.fields.slug}/>
+                <Postcard key={item.id} title={item.frontmatter.title} description={item.frontmatter.description} date={item.frontmatter.date} tag={item.frontmatter.tag} slug={item.fields.slug} thumbnail={item.frontmatter.hero_image_url}/>
             ))}
           </div>
         </div>
@@ -34,6 +34,13 @@ query {
         date(formatString: "YYYY-MM-DD")
         tag
         description
+        hero_image_url {
+          childImageSharp {
+            gatsbyImageData(
+              width: 300
+            )
+          }
+        }
       }
       id
       fields {

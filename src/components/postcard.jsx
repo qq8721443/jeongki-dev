@@ -1,13 +1,22 @@
 import { Link } from 'gatsby';
 import React from 'react';
+import { GatsbyImage, getImage } from 'gatsby-plugin-image';
 import { postcardContainer, postcardTop, postcardBottom } from './postcard.module.css';
 
-export default function Postcard({title, description, date, tag, slug}) {
+export default function Postcard({title, description, date, tag, slug, thumbnail}) {
     const pathName = typeof window !== 'undefined'?window.location.pathname:'/';
+    const thumbnailImage = getImage(thumbnail);
     return (
         <Link to={pathName==='/'?`post/${slug}`:`${slug}`}>
         <div className={postcardContainer}>
-            <div className={postcardTop}></div>
+            <div className={postcardTop}>
+                {thumbnail !== null?
+                <GatsbyImage style={{width:'100%'}} image={thumbnailImage} alt="thumbnail-image"/>
+                :
+                // <div style={{width:'100%', height:'100%', backgroundColor:'mediumaquamarine', fontSize:'1.2rem', fontWeight:'600', display:'flex', justifyContent:'center', alignItems:'center'}}>{title}</div>
+                undefined
+                }
+            </div>
             <div className={postcardBottom}>
                 <div style={{flex:1, fontSize:'1.2rem', fontWeight:500}}>{title}</div>
                 <div style={{flex:3}}>{description}</div>

@@ -14,6 +14,13 @@ export default function Page1() {
               date(formatString: "YYYY-MM-DD")
               tag
               description
+              hero_image_url {
+                  childImageSharp {
+                      gatsbyImageData(
+                          width:300
+                      )
+                  }
+              }
             }
             id
             fields {
@@ -36,7 +43,7 @@ export default function Page1() {
             </div>
             <div className={postContainer}>
             {data.allMdx.nodes.map(item => (
-              <Postcard key={item.id} title={item.frontmatter.title} description={item.frontmatter.description} date={item.frontmatter.date} tag={item.frontmatter.tag} slug={item.fields.slug}/> // title, description, date, tag 필요
+              <Postcard key={item.id} title={item.frontmatter.title} description={item.frontmatter.description} date={item.frontmatter.date} tag={item.frontmatter.tag} slug={item.fields.slug} thumbnail={item.frontmatter.hero_image_url}/> // title, description, date, tag 필요
             ))}
             </div>
         </Layout>
