@@ -4,6 +4,7 @@ import { MDXRenderer } from 'gatsby-plugin-mdx';
 import React from 'react';
 import Layout from './layout';
 import './postLayout.module.css';
+import { Blockquote, A } from './markdown-react-component';
 
 const shortcodes = {Link};
 
@@ -25,7 +26,10 @@ export default function DetailPage({data}){
                 </div>
             </div>
             <main style={{marginTop:'50px'}}>
-                <MDXProvider components={shortcodes}>
+                <MDXProvider components={{
+                    blockquote:Blockquote,
+                    a: A,
+                    }}>
                     <MDXRenderer frontmatter={data.mdx.frontmatter}>
                         {data.mdx.body}
                     </MDXRenderer>

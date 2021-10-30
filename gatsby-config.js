@@ -25,7 +25,7 @@ module.exports = {
       resolve:"gatsby-plugin-nprogress",
       options:{
         color: `mediumaquamarine`,
-        showSpinnner: false,
+        showSpinner: false,
       }
     },
     "gatsby-remark-reading-time",

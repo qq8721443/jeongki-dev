@@ -1,6 +1,25 @@
+/*alignItems:'center', fontSize:'2rem', border:'2px solid var(--line-color)'*/
+.main {
+  width: 100%;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  border: 2px solid var(--line-color);
+}
+
 .post-container {
   display: grid;
   width: 100%;
   grid-template-columns: repeat(auto-fit, minmax(300px, auto));
   column-gap: 10px;
+  margin-top: 20px;
+}
+
+@media screen and (max-width: 768px) {
+  .main {
+    font-size: 1.3rem;
+  }
 }
