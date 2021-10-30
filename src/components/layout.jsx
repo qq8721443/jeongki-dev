@@ -1,5 +1,4 @@
 import React from 'react';
-import { Helmet } from 'react-helmet';
 import { Link } from 'gatsby';
 import NProgress from 'nprogress';
 import { navigator, insideNav, logo, menu, listItem, naviItem, mainContent, footer, insideFooter } from './layout.module.css';
@@ -8,7 +7,6 @@ import { defineCustomElements as deckDeckGoHighlightElement } from "@deckdeckgo/
 deckDeckGoHighlightElement();
 
 export default function Layout({ children }){
-    const [displayMode, setDisplayMode] = React.useState(null);
     React.useLayoutEffect(() => {
         // NProgress.start();
         const displayMode = localStorage.getItem('display_mode');

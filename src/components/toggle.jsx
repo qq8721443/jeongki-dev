@@ -15,8 +15,7 @@ export default function Toggle() {
         // }
         // 서버 사이드 렌더링 때문에 렌더링 할때 로컬 스토리지를 못 쓰는듯?
         setDisplay(document.documentElement.getAttribute('display-mode'));
-        console.log(document.documentElement.getAttribute('display-mode'));
-    })
+    }, [display])
     
     const handleToggleButton = () => {
         const display_mode = localStorage.getItem('display_mode');
@@ -32,7 +31,7 @@ export default function Toggle() {
     }
 
     return (
-        <div className={toggleContainer} onClick={handleToggleButton} style={{backgroundColor:'var(--toggle-back-color)'}}>
+        <div className={toggleContainer} onKeyDown={handleToggleButton} role="button" tabIndex={0} onClick={handleToggleButton} style={{backgroundColor:'var(--toggle-back-color)'}}>
             <div className={circle} style={{transform:'translateX(var(--toggle-position))', backgroundColor:'var(--toggle-button-color)'}}>
                 {display === 'light'?'☀️':display === 'dark'?'🌙':undefined}
             </div>

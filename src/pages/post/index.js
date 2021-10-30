@@ -1,6 +1,6 @@
 import React from 'react';
 import Layout from '../../components/layout';
-import {graphql, Link, useStaticQuery} from 'gatsby';
+import {graphql, useStaticQuery} from 'gatsby';
 import {postContainer, topContainer, topLeft, topRight} from './index.module.css';
 import Postcard from '../../components/postcard';
 

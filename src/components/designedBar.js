@@ -1,5 +1,4 @@
 import React from 'react';
-import {bar} from './designedBar.module.css';
 
 export default function DesignedBar({width, fraction, color}) {
     return (
