@@ -1,13 +1,14 @@
 import { Link } from 'gatsby';
 import React from 'react';
 import { GatsbyImage, getImage } from 'gatsby-plugin-image';
+import NProgress from 'nprogress';
 import { postcardContainer, postcardTop, postcardBottom } from './postcard.module.css';
 
 export default function Postcard({title, description, date, tag, slug, thumbnail}) {
     const pathName = typeof window !== 'undefined'?window.location.pathname:'/';
     const thumbnailImage = getImage(thumbnail);
     return (
-        <Link to={pathName==='/'?`post/${slug}`:`${slug}`}>
+        <Link to={pathName==='/'?`post/${slug}`:`${slug}`} onClick={() => NProgress.start()}>
         <div className={postcardContainer}>
             <div className={postcardTop}>
                 {thumbnail !== null?

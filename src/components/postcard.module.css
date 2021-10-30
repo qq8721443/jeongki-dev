@@ -8,6 +8,7 @@
   margin-top: 20px;
   cursor: pointer;
   transition: all 0.3s ease;
+  border: 2px solid var(--line-color);
 }
 
 .postcard-container:hover {
@@ -17,7 +18,7 @@
 
 .postcard-top {
   flex: 9;
-  background-color: #c6e4bb;
+  background-color: mediumaquamarine;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
   display: flex;
