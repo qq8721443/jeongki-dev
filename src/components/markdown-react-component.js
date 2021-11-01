@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'gatsby';
 export function Blockquote({ children }) {
     return (
         <blockquote style={{paddingLeft:'15px', borderLeft:'7px solid #808080'}}>

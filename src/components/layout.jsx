@@ -3,12 +3,10 @@ import { Link } from 'gatsby';
 import NProgress from 'nprogress';
 import { navigator, insideNav, logo, menu, listItem, naviItem, mainContent, footer, insideFooter } from './layout.module.css';
 import Toggle from './toggle.jsx';
-import { defineCustomElements as deckDeckGoHighlightElement } from "@deckdeckgo/highlight-code/dist/loader";
-deckDeckGoHighlightElement();
+import Seo from './SEO';
 
 export default function Layout({ children }){
     React.useLayoutEffect(() => {
-        // NProgress.start();
         const displayMode = localStorage.getItem('display_mode');
         if (displayMode === null){
             localStorage.setItem('display_mode', 'light');
@@ -20,6 +18,7 @@ export default function Layout({ children }){
     })
     return (
         <div>
+            <Seo />
             <nav className={navigator}>
                 <div className={insideNav}>
                     <div className={naviItem}>

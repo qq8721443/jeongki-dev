@@ -2,6 +2,7 @@ module.exports = {
   siteMetadata: {
     siteUrl: "https://jeongki.dev",
     title: "Jeongki Dev",
+    description:"Jeongki의 개발 실력 향상을 위한 블로그입니다."
   },
   plugins: [
     {
@@ -11,16 +12,7 @@ module.exports = {
         path:`${__dirname}/src/contents`
       },
     },
-    {
-      resolve:"gatsby-plugin-mdx",
-      options:{
-        gatsbyRemarkPlugins: [
-          {
-            resolve: "gatsby-remark-highlight-code"
-          }
-        ]
-      }
-    },
+    "gatsby-plugin-mdx",
     {
       resolve:"gatsby-plugin-nprogress",
       options:{
@@ -31,6 +23,9 @@ module.exports = {
     "gatsby-remark-reading-time",
     "gatsby-plugin-image",
     "gatsby-plugin-sharp",
-    "gatsby-transformer-sharp"
+    "gatsby-transformer-sharp",
+    "gatsby-plugin-sitemap",
+    "gatsby-plugin-react-helmet",
+    "prism-react-renderer"
   ],
 };
