@@ -12,10 +12,9 @@ export default function Postcard({title, description, date, tag, slug, thumbnail
         <div className={postcardContainer}>
             <div className={postcardTop}>
                 {thumbnail !== null?
-                <GatsbyImage style={{width:'100%'}} image={thumbnailImage} alt="thumbnail-image"/>
+                <GatsbyImage style={{width:'100%', height:'100%'}} image={thumbnailImage} alt="thumbnail-image"/>
                 :
-                // <div style={{width:'100%', height:'100%', backgroundColor:'mediumaquamarine', fontSize:'1.2rem', fontWeight:'600', display:'flex', justifyContent:'center', alignItems:'center'}}>{title}</div>
-                undefined
+                <div style={{width:'100%', height:'100%', fontSize:'1.3rem', fontWeight:'600', display:'flex', justifyContent:'center', alignItems:'center'}}>{title}</div>
                 }
             </div>
             <div className={postcardBottom}>
@@ -23,7 +22,7 @@ export default function Postcard({title, description, date, tag, slug, thumbnail
                 <div style={{flex:3}}>{description}</div>
                 <div style={{flex:1, display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                     <div>{date}</div>
-                    <div>{tag.map((item, index) => (
+                    <div>{tag?.map((item, index) => (
                         <div key={index} style={{display:'inline-block', color:'mediumaquamarine', padding:'0 5px', margin:'0 2px', border:'1px solid mediumaquamarine', borderRadius:'7.5px'}}>
                             {item}
                         </div>

@@ -12,6 +12,23 @@ module.exports = {
         path:`${__dirname}/src/contents`
       },
     },
+    {
+      resolve: "gatsby-source-filesystem",
+      options: {
+        name: 'images',
+        path: `${__dirname}/src/images`
+      }
+    },
+    {
+      resolve: "gatsby-plugin-manifest",
+      options: {
+        name:"Jeongki Dev",
+        short_name:"JeongkiDev",
+        start_url:'/',
+        display:'standalone',
+        icon: "src/images/favicon-16x16.png"
+      }
+    },
     "gatsby-plugin-mdx",
     {
       resolve:"gatsby-plugin-nprogress",
