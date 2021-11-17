@@ -6,16 +6,33 @@ import Toggle from './toggle.jsx';
 import Seo from './SEO';
 
 export default function Layout({ children }){
+    // React.useLayoutEffect(() => {
+    //     const displayMode = localStorage.getItem('display_mode');
+    //     if (displayMode === null){
+    //         localStorage.setItem('display_mode', 'light');
+    //     }
+    //     document.documentElement.setAttribute('display-mode', localStorage.getItem('display_mode'));
+    // })
+    let websiteTheme
+    if (typeof window !== `undefined`) {
+        websiteTheme = window.__theme
+    }
+
+    const [theme, setTheme] = React.useState(websiteTheme)
+
     React.useLayoutEffect(() => {
-        const displayMode = localStorage.getItem('display_mode');
-        if (displayMode === null){
-            localStorage.setItem('display_mode', 'light');
+        setTheme(window.__theme)
+        window.__onThemeChange = () => {
+            setTheme(window.__theme)
         }
-        document.documentElement.setAttribute('display-mode', localStorage.getItem('display_mode'));
-    })
-    React.useEffect(() => {
+ 
         NProgress.done();
-    })
+    }, [])
+
+    const ThemeToggle = () => {
+        window.__setPreferredTheme(websiteTheme === 'dark' ? 'light' : 'dark')
+    }
+
     return (
         <div>
             <Seo />
@@ -44,7 +61,7 @@ export default function Layout({ children }){
                         </div>
                     </div>
                     <div className={naviItem}>
-                            <Toggle/>
+                            <Toggle theme={theme} changeFunc={ThemeToggle}/>
                     </div>
                 </div>
             </nav>
