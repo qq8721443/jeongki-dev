@@ -24,6 +24,7 @@ export default function Layout({ children }){
         setTheme(window.__theme)
         window.__onThemeChange = () => {
             setTheme(window.__theme)
+            console.log('함수 실행')
         }
  
         NProgress.done();

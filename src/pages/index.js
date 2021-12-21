@@ -9,8 +9,7 @@ export default function MainPage({ data }){
     <Layout>
       <div>
         <div className={main}>
-          <div>매일매일 배운거 하나라도 정리해서</div>
-          <div><strong>죽기 직전</strong>까지 배워서 채우기</div>
+          
         </div>
         <div style={{width:'100%', marginTop:'50px'}}>
           <div style={{fontSize:'18px'}}>최신 포스트</div>

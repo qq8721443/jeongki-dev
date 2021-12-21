@@ -2,16 +2,17 @@ const React = require('react')
 
 exports.onRenderBody = ({ setPreBodyComponents }) => {
   setPreBodyComponents([
-    React.createElement('script', {
+    React.createElement('script',{
+      key: 1,
       dangerouslySetInnerHTML: {
         __html: `
-          (() => {    
-            window.__onThemeChange = function() {};                
+          (() => {
+            window.__onThemeChange = function() {};        
             function setTheme(newTheme) {                  
               window.__theme = newTheme;                  
               preferredTheme = newTheme;                  
-              document.documentElement.setAttribute('display-mode', newTheme);             
-              window.__onThemeChange(newTheme);                
+              document.documentElement.setAttribute('display-mode', newTheme);
+              window.__onThemeChange(newTheme);                             
             }
 
             let preferredTheme
