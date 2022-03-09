@@ -17,13 +17,16 @@
 
 .postcard-top {
   flex: 9;
-  background-color: rgb(211, 210, 197);
+  background-color: var(--post-top-back-color);
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  text-align: center;
+  word-break: keep-all;
+  color: var(--post-top-font-color);
 }
 
 .postcard-bottom {

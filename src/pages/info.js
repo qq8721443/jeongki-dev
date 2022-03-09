@@ -1,30 +1,38 @@
-import React from 'react';
-import Layout from '../components/layout';
-import {mainInfo, mainInfoLeft, mainInfoRight, infoImage} from './info.module.css';
-import DesignedBar from '../components/designedBar';
+import React from "react";
+import Layout from "../components/layout";
+import {
+  mainInfo,
+  mainInfoLeft,
+  mainInfoRight,
+  infoImage,
+  infoMarkdownArea,
+} from "./info.module.css";
+import DesignedBar from "../components/designedBar";
+import { MdEmail } from "react-icons/md";
+import { FaGithub } from "react-icons/fa";
 
 export default function InfoPage() {
-    return (
-        <Layout>
-            <div className={mainInfo}>
-                <div className={mainInfoLeft}>
-                    <div className={infoImage}>
-                    </div>
-                </div>
-                <div className={mainInfoRight}>
-                    <div>Jeongki</div>
-                    <div>항상 끊임없이 배우는 개발자가 되고 싶습니다.</div>
-                    <div>
-                        <div>사용 기술</div>
-                        <div>
-                            HTML <DesignedBar width="100%" fraction={80} color="#F6D7A7"/>
-                            CSS <DesignedBar width="100%" fraction={50} color="#F6EABE"/>
-                            JavaScript <DesignedBar width="100%" fraction={35} color="#C8E3D4"/>
-                            React <DesignedBar width="100%" fraction={20} color="#87AAAA"/>
-                        </div>
-                    </div>
-                </div>
+  return (
+    <Layout>
+      <div className={mainInfo}>
+        <div className={mainInfoLeft}>
+          <div className={infoImage}></div>
+        </div>
+        <div className={mainInfoRight}>
+          <div>Jeongki</div>
+          <div>끊임없이 발전하는 프론트엔드 개발자가 되고 싶습니다.</div>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <MdEmail size={25} />: qq8721443@naver.com
+          </div>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <FaGithub size={25} />
+            <div>
+              <a href="https://github.com/qq8721443">: github.com/qq8721443</a>
             </div>
-        </Layout>
-    )
+          </div>
+        </div>
+      </div>
+      <div className={infoMarkdownArea}>나를 나타낼 수 있는 글 쓰기</div>
+    </Layout>
+  );
 }
