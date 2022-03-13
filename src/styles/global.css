@@ -15,6 +15,7 @@ html,
 body {
   background-color: var(--bgcolor);
   color: var(--font-color);
+  font-size: 16px;
   font-family: "Noto Sans KR", sans-serif;
 }
 
@@ -37,6 +38,7 @@ select {
   --toggle-position: -1px;
   --post-top-back-color: #189ad3;
   --post-top-font-color: rgba(255, 255, 255, 0.87);
+  --post-tag-back-color: #189ad3;
 }
 
 [display-mode="dark"] {
@@ -52,6 +54,7 @@ select {
   --toggle-position: 51px;
   --post-top-back-color: #333;
   --post-top-font-color: rgba(255, 255, 255, 0.87);
+  --post-tag-back-color: #1677a2;
 }
 
 a {
