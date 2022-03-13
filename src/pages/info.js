@@ -7,7 +7,6 @@ import {
   infoImage,
   infoMarkdownArea,
 } from "./info.module.css";
-import DesignedBar from "../components/designedBar";
 import { MdEmail } from "react-icons/md";
 import { FaGithub } from "react-icons/fa";
 
