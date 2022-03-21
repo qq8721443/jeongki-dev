@@ -26,7 +26,11 @@ export function H2(props) {
   return (
     <h2
       {...props}
-      style={{ fontWeight: "500", margin: "50px 0px", color: "#606060" }}
+      style={{
+        fontWeight: "500",
+        margin: "50px 0px",
+        color: "var(--font-color)",
+      }}
     >
       {props.children}
     </h2>
@@ -65,7 +69,7 @@ export function Em(props) {
         all: "unset",
         width: "100%",
         height: "100%",
-        backgroundColor: "#dedede",
+        backgroundColor: "var(--post-em-back-color)",
         fontSize: "1rem",
         padding: "5px",
         borderRadius: "5px",

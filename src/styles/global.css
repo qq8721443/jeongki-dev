@@ -39,6 +39,7 @@ select {
   --post-top-back-color: #189ad3;
   --post-top-font-color: rgba(255, 255, 255, 0.87);
   --post-tag-back-color: #189ad3;
+  --post-em-back-color: #dedede;
 }
 
 [display-mode="dark"] {
@@ -55,6 +56,7 @@ select {
   --post-top-back-color: #333;
   --post-top-font-color: rgba(255, 255, 255, 0.87);
   --post-tag-back-color: #1677a2;
+  --post-em-back-color: rgb(100, 100, 100);
 }
 
 a {
