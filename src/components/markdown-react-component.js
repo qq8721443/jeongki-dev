@@ -5,7 +5,8 @@ export function Blockquote({ children }) {
       style={{
         padding: "15px",
         margin: "15px",
-        borderLeft: "7px solid #808080",
+        borderLeft: "3px solid #808080",
+        color: "#909090",
       }}
     >
       {children}
@@ -23,7 +24,10 @@ export function A(props) {
 
 export function H2(props) {
   return (
-    <h2 {...props} style={{ fontWeight: "500", margin: "20px 0px" }}>
+    <h2
+      {...props}
+      style={{ fontWeight: "500", margin: "50px 0px", color: "#606060" }}
+    >
       {props.children}
     </h2>
   );
@@ -50,5 +54,22 @@ export function Ul(props) {
     <ul {...props} style={{ margin: "0px 20px", padding: "10px" }}>
       {props.children}
     </ul>
+  );
+}
+
+export function Em(props) {
+  return (
+    <em
+      {...props}
+      style={{
+        all: "unset",
+        width: "100%",
+        height: "100%",
+        backgroundColor: "#dedede",
+        fontSize: "1rem",
+        padding: "5px",
+        borderRadius: "5px",
+      }}
+    ></em>
   );
 }

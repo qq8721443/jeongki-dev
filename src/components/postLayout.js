@@ -47,7 +47,9 @@ export default function DetailPage({ data }) {
           <div>{data.mdx.fields.readingTime.text}</div>
         </div>
       </div>
-      <main style={{ marginTop: "50px", fontSize: "1.2rem" }}>
+      <main
+        style={{ marginTop: "50px", fontSize: "1.2rem", lineHeight: "2rem" }}
+      >
         <MDXProvider
           components={{
             blockquote: MDXDesign.Blockquote,
@@ -57,6 +59,7 @@ export default function DetailPage({ data }) {
             h3: MDXDesign.H3,
             ol: MDXDesign.Ol,
             ul: MDXDesign.Ul,
+            em: MDXDesign.Em,
           }}
         >
           <MDXRenderer frontmatter={data.mdx.frontmatter}>
