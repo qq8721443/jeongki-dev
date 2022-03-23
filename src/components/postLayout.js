@@ -48,7 +48,12 @@ export default function DetailPage({ data }) {
         </div>
       </div>
       <main
-        style={{ marginTop: "50px", fontSize: "1.2rem", lineHeight: "2rem" }}
+        style={{
+          marginTop: "50px",
+          fontSize: "1.2rem",
+          lineHeight: "2rem",
+          wordBreak: "break-all",
+        }}
       >
         <MDXProvider
           components={{

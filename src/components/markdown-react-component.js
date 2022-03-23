@@ -16,7 +16,10 @@ export function Blockquote({ children }) {
 
 export function A(props) {
   return (
-    <a {...props} style={{ fontWeight: "500", color: "#189AD3" }}>
+    <a
+      {...props}
+      style={{ fontWeight: "500", color: "#189AD3", whiteSpace: "pre-wrap" }}
+    >
       {props.children}
     </a>
   );
