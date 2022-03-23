@@ -61,6 +61,14 @@ export function Ul(props) {
   );
 }
 
+export function Li(props) {
+  return (
+    <li {...props} style={{ margin: "20px 0" }}>
+      {props.children}
+    </li>
+  );
+}
+
 export function Em(props) {
   return (
     <em
