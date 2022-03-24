@@ -3,6 +3,7 @@ module.exports = {
     siteUrl: "https://jeongki.dev",
     title: "Jeongki Dev",
     description: "Jeongki의 개발 실력 향상을 위한 블로그입니다.",
+    image: `${__dirname}/src/images/blog-thumbnail.jpg`,
   },
   plugins: [
     {

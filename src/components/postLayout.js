@@ -11,7 +11,18 @@ import { Helmet } from "react-helmet";
 export default function DetailPage({ data }) {
   return (
     <Layout>
-      <Helmet title={`${data.mdx.frontmatter.title} | Jeongki Dev`}></Helmet>
+      <Helmet title={`${data.mdx.frontmatter.title} | Jeongki Dev`}>
+        <meta name="description" content={data.mdx.frontmatter.description} />
+        <meta name="keywords" content={data.mdx.frontmatter.tag} />
+
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={data.mdx.frontmatter.title} />
+        <meta property="og:site_name" content="Jeongki Dev" />
+        <meta
+          property="og:description"
+          content={data.mdx.frontmatter.description}
+        />
+      </Helmet>
       <div>
         <header style={{ fontSize: "2rem", fontWeight: 400 }}>
           {data.mdx.frontmatter.title}
