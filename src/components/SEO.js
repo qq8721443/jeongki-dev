@@ -22,7 +22,6 @@ export default function SEO() {
     <Helmet title={data.site.siteMetadata.title}>
       <meta name="description" content={data.site.siteMetadata.description} />
       <meta name="url" content={data.site.siteMetadata.siteUrl} />
-      <meta property="og:title" content={data.site.siteMetadata.image} />
     </Helmet>
   );
 

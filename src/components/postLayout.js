@@ -7,6 +7,7 @@ import "./postLayout.module.css";
 import * as MDXDesign from "./markdown-react-component";
 import CodeBlock from "./CodeBlock";
 import { Helmet } from "react-helmet";
+import Thumbnail from "../images/blog-thumbnail.jpg";
 
 export default function DetailPage({ data }) {
   return (
@@ -22,6 +23,7 @@ export default function DetailPage({ data }) {
           property="og:description"
           content={data.mdx.frontmatter.description}
         />
+        <meta property="og:image" content={Thumbnail} />
       </Helmet>
       <div>
         <header style={{ fontSize: "2rem", fontWeight: 400 }}>
