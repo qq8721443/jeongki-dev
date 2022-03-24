@@ -17,7 +17,12 @@ export default function DetailPage({ data }) {
           {data.mdx.frontmatter.title}
         </header>
         <div
-          style={{ display: "flex", alignItems: "center", marginTop: "30px" }}
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            marginTop: "30px",
+          }}
         >
           {data.mdx.frontmatter.tag.map((tag, i) => (
             <div
