@@ -1,0 +1,235 @@
+---
+title: "[데브코스] 4일차 TIL"
+description: 자바스크립트 주요 문법(4)
+tag: [공부, 자바스크립트, javascript, 데브코스, TIL, 자료구조, 알고리즘]
+date: 2022-03-24
+---
+
+## 들어가며
+
+오늘도 자료구조에 대해 공부한다. 자료구조를 공부하면서 지금까지 내가 부족했던 부분을 채우는 느낌이 들어 기분이 좋다.
+
+## 큐
+
+나중에 들어간 값이 먼저 나오는 스택과 다르게, 먼저 들어간 값이 먼저 나오는 FIFO(First In First Out) 자료구조이다. 일상생활에서 줄 서는 것에 비유할 수 있다. PCR을 받기 위해 보건소에 줄을 서는 상황을 생각해보자. 먼저 와서 기다린 맨 앞에 있는 사람은 검사를 받기 위해 나갈 것이고 늦게 온 사람은 줄의 맨 뒤에 서서 기다릴 것이다. 큐도 같다. 먼저 들어온 데이터는 먼저 나가고 나중에 들어온 데이터는 나중에 나간다. 큐에 데이터를 넣는 것을 **enqueue**, 데이터를 빼는 것을 **dequeue**라고 한다.
+
+큐는 **선형 큐**와 **원형 큐**로 나뉜다.
+
+- 선형 큐: 기본적인 형태의 큐이다. 선형 큐는 배열 또는 연결 리스트를 사용해 구현할 수 있다. 코드를 살펴보자.
+
+  ```javascript
+  class Queue {
+    constructor() {
+      this.queue = [];
+      this.front = 0;
+      this.rear = 0;
+    }
+
+    enqueue(value) {
+      this.queue[this.rear++] = value;
+    }
+
+    dequeue() {
+      const value = this.queue[this.front];
+      delete this.queue[this.front];
+      this.front++;
+      return value;
+    }
+  }
+
+  const queue = new Queue();
+  queue.enqueue(1); // [1]
+  queue.enqueue(2); // [1, 2]
+  queue.enqueue(3); // [1, 2, 3]
+  queue.enqueue(4); // [1, 2, 3, 4]
+  console.log(queue.dequeue()); // 1    [2, 3, 4]
+  console.log(queue.dequeue()); // 2.   [3, 4]
+  ```
+
+  자바스크립트의 배열을 사용해 큐를 구현했다. 배열을 사용해 구현을 하면 **dequeue** 했을 때, 배열의 앞부분에 빈 공간이 생기고 **enqueue**를 했을 때 배열의 크기가 무한정 커진다는 단점이 있다. 그러나 요즘은 메모리 공간이 매우 크기 때문에 크게 신경쓰지 않아도 될 것 같다. 이 문제를 해결하고 싶다면 연결 리스트를 사용하면 된다. 기존에 연결 리스트 구현하는 방법에서 Head가 Front, Tail이 Rear라는 점만 알아두면 될 것 같다.
+
+  > 조심할 것!
+  >
+  > 구글에 자바스크립트 배열로 구현한 큐의 코드를 보면 배열의 shift 메서드를 사용한 예제를 볼 수 있다. 동작은 제대로 하지만 shift는 자동으로 배열의 빈 공간을 없애기 때문에 O(n) 만큼의 시간이 소요된다. 따라서 올바르게 큐를 사용하기 위해선 front와 rear 변수를 사용해 구현하는 것을 권장한다.
+
+### 큐 실습
+
+큐 실습은 프로그래머스의 [프린터 문제](https://programmers.co.kr/learn/courses/30/lessons/42587?language=javascript)를 풀면서 진행했다. 예전에 코딩테스트 공부할 때 풀었던 문제였는데, 처음 푸는 것 같은 느낌이 들었다. 예전에 풀었던 코드와 오늘 다시 푼 코드를 비교해보았다.
+
+- 오늘 푼 코드
+
+  ```javascript
+  class Queue {
+    constructor() {
+      this.queue = [];
+      this.front = 0;
+      this.rear = 0;
+    }
+
+    enqueue(value) {
+      this.queue[this.rear++] = value;
+    }
+
+    dequeue() {
+      const value = this.queue[this.front];
+      delete this.queue[this.front++];
+      return value;
+    }
+
+    priorCheck(e) {
+      // 큐에 우선순위가 더 높은 파일이 있는지 확인
+      for (let i = this.front; i < this.rear; i++) {
+        if (this.queue[i].value > e) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    isEmpty() {
+      // 큐가 비어 있는지 확인
+      return this.queue.length === 0;
+    }
+  }
+
+  function solution(priorities, location) {
+    const queue = new Queue();
+    priorities.map((e, i) => queue.enqueue({ value: e, index: i }));
+    let count = 0;
+    while (!queue.isEmpty()) {
+      const e = queue.dequeue();
+      if (!queue.priorCheck(e.value)) {
+        queue.enqueue(e);
+      } else {
+        count++;
+        if (e.index === location) {
+          return count;
+        }
+      }
+    }
+  }
+  ```
+
+- 예전에 푼 코드
+
+  ```javascript
+  function solution(priorities, location) {
+    let answer = 0;
+    let count = 0;
+    let queue = priorities.map((value, index) => {
+      return { isLocation: index === location, value: value };
+    });
+
+    while (queue.length) {
+      let current = queue.shift();
+
+      if (queue.some((item) => item.value > current.value)) {
+        queue.push(current);
+      } else {
+        count++;
+        if (current.isLocation) {
+          answer = count;
+          break;
+        }
+      }
+    }
+    return answer;
+  }
+  ```
+
+예전에 풀었던 코드는 어떤 생각을 가지고 풀었는지 기억이 나지 않아 한참을 들여다 봤다. 예전에 문제를 풀려고 했지만 어떻게 풀어야 할 지 몰라서 다른 사람의 코드를 참고해 풀었던 것 같다. 배열을 큐로 사용하고 enqueue는 push, dequeue는 shift 메서드를 사용해 문제를 해결했다. 예전 코드가 좀 더 짧긴 하지만 한 눈에 알아보기 어려웠고, shift 메서드를 사용했기 때문에 실행 시간이 오늘 작성한 코드보다 좀 더 길었다. 예전에는 못 풀었던 문제를 스스로 해결할 수 있어서 뿌듯했다.
+
+## 해시 테이블
+
+해시 테이블은 사물함을 생각하면 이해하기 편할 것 같다. 키와 값을 받아 키를 해싱하여 나온 index에 값을 저장하는 선형 자료구조로, 삽입은 O(1)의 시간이 걸리고 삭제와 탐색 또한 키를 알고 있으면 O(1)로 수행 가능하다.
+
+> 해시함수란?
+>
+> 입력 받은 값을 특정 범위 내 숫자로 변경하는 함수이다. 이 함수에 키를 넣어 값을 반환받는 과정을 해싱이라고 한다.
+
+그런데 해시 함수의 범위는 정해져 있기 때문에 운이 나쁘면 다른 키를 해싱 하더라고 같은 값을 반환할 수 있다. 이 상황을 **해시 충돌**(Hash Collision)이라고 한다. 이때 해결하는 방법으로 크게 4가지가 있는데 **선형 탐사법**, **제곱 탐사법**, **이중 해싱**, **분리 연결법**이다.
+
+1. 선형 탐사법: 충돌이 발생하면 인덱스를 한 칸 옆으로 이동해 저장한다. 바로 인접한 인덱스에 저장하기 때문에 데이터가 밀집되는 클러스터링 현상이 발생할 수 있다.
+2. 제곱 탐사법: 충돌이 발생한 횟수의 제곱만큼 옆으로 이동한다. 좀 더 효율적이지만 초기 해시값이 같을 경우 역시 클러스터링 현상이 발생할 수 있다.
+3. 이중 해싱: 충돌이 발생하면 값을 다시 다른 해시 함수에 넣어 충돌이 발생하지 않을 때까지 반복한다.
+4. 분리 연결법: 버킷을 연결 리스트로 사용한다. 충돌이 발생하면 같은 버킷에 연결 리스트 형태로 값을 저장한다. 그러나 최악의 경우 하나의 버킷에 무한대로 추가될 수 있다.
+
+자바스크립트에서는 어떻게 사용할 수 있을까?
+
+1. 배열을 해시 테이블처럼 사용하는 방법. 이는 추천하지 않는다.
+2. 객체 사용. 제일 간단하고 정석처럼 사용하는 방법이다.
+3. Map 사용. Map은 한번도 사용해보지 않아서 어떻게 사용하는지부터 먼저 찾아봐야 할 것 같다.
+4. Set 사용. Set은 배열에서 중복되는 요소를 제거할 때 사용한 것 말고는 사용해 본 적이 없다
+
+해시 테이블 실습으로 프로그래머스의 [베스트앨범](https://programmers.co.kr/learn/courses/30/lessons/42579) 문제를 풀어보았다. 사실 풀지 못하고 해설을 보고 깨달았다. 거의 코드 한줄 한줄 복붙하면서 풀었기 때문에 꼭 다시 스스로 문제를 풀어봐야겠다.
+
+```javascript
+function solution(genres, plays) {
+  const hash = {};
+  genres = genres
+    .map((item, index) => [item, plays[index]])
+    .forEach(([genre, play], index) => {
+      const data = hash[genre] || { total: 0, songs: [] };
+      hash[genre] = {
+        total: data.total + play,
+        songs: [...data.songs, [play, index]]
+          .sort((a, b) => b[0] - a[0])
+          .slice(0, 2),
+      };
+    });
+  return Object.entries(hash)
+    .sort((a, b) => b[1].total - a[1].total)
+    .flatMap((item) => item[1].songs)
+    .map((item) => item[1]);
+}
+```
+
+위 코드는 내가 해설 강의를 보고 나중에 다시 풀어본 코드이다. 푸는 순서는 다음과 같다.
+
+1. 먼저 _genres_ 와 _plays_ 를 하나씩 묶어준다.
+2. 해시 테이블을 생성하고 묶은 배열을 순회하면서 같은 장르끼리 해시 테이블에 저장한다. 이때 재생시간의 합인 _total_ 변수와 각 노래의 재생 시간, 고유 번호를 저장할 수 있는 _song_ 변수를 만들어준다. 이때 _song_ 변수를 저장할 때, 재생 시간이 높은 순서대로 정렬하고 두 개의 노래만 남겨두는 과정을 진행한다.
+3. 해시 테이블을 전체 재생 시간 순으로 내림차순 정렬하기 위해 배열로 변경한다. (sort 메서드를 사용하기 위해)
+4. 전체 재생 시간이 높은 순서로 정렬한다.
+5. 정렬한 배열을 순서대로 순회하면서 _song_ 값을 반환한다.
+
+정리해도 어려운 것 같다😥
+
+> 새로 알게된 것
+>
+> 1. flatMap 이라는 메서드를 새로 알게 됐다. 사용법은 map과 같은데 배열을 반환할 때 새로운 배열로 평탄화한다. 아마 자주 쓰게 되지 않을까 생각한다.
+> 2. forEach와 map의 차이
+>    forEach와 map의 차이점은 반환하는 값이 있는지가 다른 것 같다. forEach는 순회하면서 해야할 작업이 있을 때 사용하고, map은 반환해야 할 배열이 있을 때 사용한다.
+
+## 그래프
+
+그래프는 **정점**(Node)과 정점 사이를 연결하는 **간선**(Edge)으로 이루어진 비선형 자료구조이다. 정점 집합과 간선 집합으로 표현할 수 있다. 실제 사용되는 예시로 지하철 노선도, 페이지 랭크 알고리즘 등이 있다. 그래프는
+
+- 한 정점은 여러개의 간선을 가질 수 있고
+- 크게 방향 그래프와 무방향 그래프로 나뉘고
+- 간선은 가중치를 가질 수 있고
+- 사이클이 발생할 수 있다
+
+라는 특징을 가지고 있다.
+
+### 그래프의 종류
+
+그래프의 종류는 **간선의 방향**에 따라 **방향 그래프**, **무방향 그래프**로 나눌 수 있고 **정점의 연결 상태**에 따라 **연결 그래프**, **비연결 그래프**, **완전 그래프** 등으로 나눌 수 있다.
+
+- 무방향 그래프: 간선으로 이어진 정점끼리 양방향 이동 가능
+- 방향 그래프: 간선에 방향성이 존재
+- 연결 그래프: 모든 정점이 서로 이동 가능
+- 비연결 그래프: 특정 정점쌍 사이에 간선이 존재하지 않음
+- 완전 그래프: 모든 정점끼리 연결
+
+자바스크립트에서 그래프를 구현할 때 **인접 행렬**을 사용하거나 **인접 리스트**를 사용한다.
+
+## 정리
+
+코딩테스트 문제를 푸는 것은 문제 해결 능력을 기르는 것과 동시에 자바스크립트를 좀 더 익숙하게 다루는 연습도 되고, 자료구조와 알고리즘을 공부할 수도 있는 좋은 방법인 것 같다. 앞으로 배울 자료구조와 알고리즘도 많이 남았는데 열심히 공부해서 필요할 때 원하는 대로 쓸 수 있도록 만들고 싶다.
+
+## 참고자료
+
+forEach와 map 함수의 차이 https://velog.io/@limes/Javascript-Array-Method-for-each-%EC%99%80-map%ED%95%A8%EC%88%98%EC%9D%98-%EC%B0%A8%EC%9D%B4  
+MDN flatMap https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap  
+해시 테이블 https://baeharam.github.io/posts/data-structure/hash-table/  
+그래프 https://leejinseop.tistory.com/43
