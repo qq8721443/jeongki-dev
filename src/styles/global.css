@@ -60,6 +60,6 @@ select {
 }
 
 a {
-  color: inherit;
+  color: var(--font-color);
   text-decoration: none;
 }
