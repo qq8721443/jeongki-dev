@@ -35,6 +35,7 @@ export default function DetailPage({ data }) {
             flexWrap: "wrap",
             alignItems: "center",
             marginTop: "30px",
+            rowGap: "10px",
           }}
         >
           {data.mdx.frontmatter.tag.map((tag, i) => (
