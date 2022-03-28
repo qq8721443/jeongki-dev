@@ -30,7 +30,20 @@ module.exports = {
         icon: "src/images/favicon-16x16.png",
       },
     },
-    "gatsby-plugin-mdx",
+    {
+      resolve: "gatsby-plugin-mdx",
+      options: {
+        gatsbyRemarkPlugins: [
+          {
+            resolve: "gatsby-remark-images",
+            options: {
+              maxwidth: 800,
+              wrapperStyle: "width:400px; height:300px",
+            },
+          },
+        ],
+      },
+    },
     {
       resolve: "gatsby-plugin-nprogress",
       options: {
@@ -38,6 +51,7 @@ module.exports = {
         showSpinner: false,
       },
     },
+    "gatsby-remark-images",
     "gatsby-remark-reading-time",
     "gatsby-plugin-image",
     "gatsby-plugin-sharp",
