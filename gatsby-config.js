@@ -30,15 +30,30 @@ module.exports = {
         icon: "src/images/favicon-16x16.png",
       },
     },
+    "gatsby-remark-images",
+    "gatsby-plugin-image",
+    "gatsby-plugin-sharp",
+    "gatsby-transformer-sharp",
+    "gatsby-plugin-sitemap",
+    "gatsby-plugin-react-helmet",
     {
       resolve: "gatsby-plugin-mdx",
       options: {
+        plugins: [
+          {
+            resolve: "gatsby-remark-images",
+            options: {
+              maxWidth: 800,
+              backgroundColor: "#fff",
+            },
+          },
+        ],
         gatsbyRemarkPlugins: [
           {
             resolve: "gatsby-remark-images",
             options: {
-              maxwidth: 800,
-              wrapperStyle: "width:400px; height:300px",
+              maxWidth: 800,
+              backgroundColor: "#fff",
             },
           },
         ],
@@ -51,13 +66,7 @@ module.exports = {
         showSpinner: false,
       },
     },
-    "gatsby-remark-images",
     "gatsby-remark-reading-time",
-    "gatsby-plugin-image",
-    "gatsby-plugin-sharp",
-    "gatsby-transformer-sharp",
-    "gatsby-plugin-sitemap",
-    "gatsby-plugin-react-helmet",
     "prism-react-renderer",
   ],
 };
