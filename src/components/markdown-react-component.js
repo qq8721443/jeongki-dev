@@ -88,3 +88,7 @@ export function Em(props) {
     ></em>
   );
 }
+
+export function Img(props) {
+  return <img {...props} style={{ backgroundColor: "#fff" }} />;
+}
