@@ -7,9 +7,9 @@
   -ms-overflow-style: none;
 }
 
-::-webkit-scrollbar {
+/* ::-webkit-scrollbar {
   display: none;
-}
+} */
 
 html,
 body {
@@ -17,6 +17,10 @@ body {
   color: var(--font-color);
   font-size: 16px;
   font-family: "Noto Sans KR", sans-serif;
+}
+
+html {
+  overflow-x: hidden;
 }
 
 input,
