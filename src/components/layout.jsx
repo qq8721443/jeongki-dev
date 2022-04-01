@@ -1,4 +1,5 @@
 import React from "react";
+import { AiOutlineToTop } from "react-icons/ai";
 import { Link } from "gatsby";
 import NProgress from "nprogress";
 import {
@@ -11,6 +12,7 @@ import {
   mainContent,
   footer,
   insideFooter,
+  floatGoToTopButton,
 } from "./layout.module.css";
 import Toggle from "./toggle.jsx";
 import Seo from "./SEO";
@@ -80,6 +82,12 @@ export default function Layout({ children }) {
       <footer className={footer}>
         <div className={insideFooter}>copyright 2021-2022. Jeongki.dev</div>
       </footer>
+      <div
+        className={floatGoToTopButton}
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      >
+        <AiOutlineToTop size={25} />
+      </div>
     </div>
   );
 }
