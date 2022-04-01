@@ -98,7 +98,8 @@ Promise.resolve(1)
 
 ## Kleisli Composition 관점에서의 Promise
 
-Promise는 Kleisli Composition을 지원한다. 이름부터 어려운 Kleisli Composition이란 오류가 있을 수 있는 상황에서의 함수 합성을 안전하게 하는 방법이다. 수학에서는 함수 f와 g가 있을 때, 항상 _f(g(x)) = f(g(x))_ 를 만족한다. 그러나 프로그래밍에서는 상태에 따라 값이 달라질 수 있다. 만약 _g(x)_ 함수에서 오류가 난다면 _f(g(x)) = g(x)_ 로 만들어주는 함수 합성 방법이 Kleisli Composition이다.
+Promise는 Kleisli Composition을 지원한다. 이름부터 어려운 Kleisli Composition이란 오류가 있을 수 있는 상황에서의 함수 합성을 안전하게 하는 방법이다. 수학에서는 함수 f와 g가 있을 때, 항상 _f(g(x)) = f(g(x))_ 를 만족한다. 그러나 프로그래밍에서는 상태에 따라 값이 달라질 수 있다. 만약 _g(x)_ 함수에서 오류가 난다면 _f(g(x)) = g(x)_ 로 만들어주는 함수 합성 방법이 Kleisli Composition이다.  
+(추가 예정...)
 
 ## 정리
 
