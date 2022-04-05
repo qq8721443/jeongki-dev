@@ -1,0 +1,176 @@
+---
+title: "[데브코스] 12일차 TIL (ES6 모듈, 비동기 처리)"
+description: ES6 모듈과 자바스크립트 비동기 처리
+tag: [공부, 자바스크립트, javascript, 데브코스, TIL, 모듈, 비동기]
+date: 2022-04-05
+---
+
+## 들어가며
+
+ES6에서 새로 나온 모듈 시스템과 자바스크립트에서 비동기를 처리하는 방법에 대해 공부했다. 모듈은 리액트를 사용할 때만 써본 것 같은데 순수 자바스크립트에서도 사용할 수 있다는 걸 새삼 깨달았다. 오늘도 기초가 중요하다는 걸 깨닫는 하루였다.
+
+## ES6 모듈
+
+ES6 (ES2015) 부터는 파이썬에서 모듈을 사용하는 방법과 같이 _import_, _export_, _from_, _default_ 와 같은 모듈 관리 전용 키워드를 사용할 수 있다. 이런 키워드를 사용하기 때문에 가독성이 좋고, 비동기 방식으로 작동하고 모듈에서 실제로 쓰이는 부분만 불러오기 때문에 성능과 메모리 부분에서 유리한 측면이 있다.  
+HTML 파일에서 script 태그를 사용해 자바스크립트 파일을 불러왔는데, 이때 script 태그에 _type="module"_ 이라는 속성을 추가하면 이 태그에서 불러오는 자바스크립트 파일은 모듈로서 동작한다.  
+ES6 이전에 모듈 기능이 없을 때에는 여러 개의 자바스크립트 파일을 script 태그를 통해 불러오게 되면, 하나의 전역을 공유하게 됐다.
+
+```javascript
+// one.js 파일
+var x = "foo";
+
+console.log(window.x); // foo
+```
+
+```javascript
+// two.js 파일
+var x = "bar";
+
+console.log(window.x); // bar
+```
+
+_one.js_ 와 _two.js_ 라는 파일이 있을 때 하나의 전역(window)를 공유하기 때문에 _one.js_ 에서 x라는 변수를 선언하고 _two.js_ 에서 같은 이름의 x라는 변수를 선언하면 전역에 저장된 x 변수에 bar라는 문자열이 재할당되게 된다.
+
+ES6 모듈은 파일 자체의 스코프를 제공한다. 이를 _모듈 스코프_ 라고 하는데, 모듈 내에서 선언한 변수들은 모듈 내에서만 유효하게 된다.
+
+## **export** 키워드
+
+위에서 설명한 것처럼 모듈 자체 스코프를 가지기 때문에 각 모듈에 선언된 모든 식별자는 해당 모듈 내에서만 참조가 가능하다. 이를 모듈 외부에 공개해 다른 모듈에서 참조할 수 있게 하기 위해 _export_ 라는 키워드를 사용한다.
+
+```javascript
+export const name = "jeongki";
+
+export function add(a, b) {
+  return a + b;
+}
+
+export class Person {
+  constructor(name) {
+    this.name = name;
+  }
+}
+```
+
+위의 코드처럼 외부에 공개하고 싶은 변수, 함수 또는 클래스의 선언문 앞에 _export_ 키워드를 사용한다. 만약 선언문 앞에 export를 붙이는 게 귀찮다면 선언 이후에 export 할 대상을 모아 하나의 객체로 구성한 뒤에 export 할 수도 있다.
+
+```javascript
+const name = "jeongki";
+
+function add(a, b) {
+  return a + b;
+}
+
+class Person {
+  constructor(name) {
+    this.name = name;
+  }
+}
+
+// 한꺼번에 export
+export { name, add, Person };
+```
+
+위의 방법은 선언된 식별자 이름과, 아래에서 설명할 _import_ 키워드를 사용해 불러올 때 사용하는 이름이 같기 때문에 **Named Exports** 라고 한다.
+
+반대로 모듈 당 딱 한 개만 export 할 수 있는 키워드가 있는데 _export default_ 키워드이다. export 다음에 default 키워드를 사용하면 된다. default 키워드는 오직 한 개만 사용할 수 있고, 여러 개를 사용하면 오류가 발생한다. 이를 **Default Exports** 라고 한다.
+
+```javascript
+export default function add(a, b) {
+  return a + b;
+}
+```
+
+## import 키워드
+
+**export** 된 변수나 함수, 객체를 가져오는데 사용된다. 아래와 같이 사용할 수 있다.
+
+```javascript
+import name from "module-name";
+import * as alias from "module-name";
+import { member } from "module-name";
+import { member as alias } from "module-name";
+import defaultMember, { member } from "module-name";
+```
+
+import를 사용해 가져오는 방법은 정말 다양하다. 먼저 Named Exports를 통해 export 된 값은 _\*_ 을 사용해 해당 모듈에서 export 된 모든 값을 가져올 수 있고, 구조분해를 사용해 원하는 값만 불러올 수도 있다. _as_ 키워드를 사용해 별칭을 설정할 수 있다.  
+만약 export default 키워드를 사용해 내보낸 값이라면 중괄호 없이 맨 앞에 변수명을 정해 불러올 수 있다. Named Exports 된 값과 Default Exports 된 값을 한 번에 불러올 수도 있는데 이때는 Default Exports의 값을 먼저 선언해주면 된다.
+
+> 주의할 점
+> from 뒤에 파일명을 적을 때 꼭 파일 확장자를 같이 적어줘야 한다.
+>
+> import/export 를 사용하려면 웹 서버가 필요하다.
+
+ES6 모듈을 사용하면 각 JS별로 사용되는 사용자 모듈을 명시적으로 import 하기 때문에 사용되거나 사용되지 않는 스크립트를 추적할 수 있다는 장점이 있다.
+
+## 자바스크립트의 비동기
+
+먼저 비동기란 특정 코드의 연산이 끝날 때까지 코드의 실행을 멈추지 않고 다음 코드를 먼저 실행하는 것을 의미한다. 자바스크립트에서 비동기 작업을 처리하는 방식은 크게 3가지가 있다. 콜백(Callback), 프로미스(Promise), async&await 이다.
+
+1. 콜백(Callback)
+   자바스크립트에는 내장된 비동기 함수가 있는데 이를 통해 콜백 함수에 대해 알아보자.
+
+   - addEventListener: 함수의 첫 번째 인자로 이벤트를 전달하고, 두 번째 인자로 해당 이벤트를 수신할 때 실행할 함수를 전달한다. 이 때 두 번째 인자로 넘겨진 함수는 바로 실행되지 않고, 이벤트가 발생했을 때 실행된다.
+   - setTimeout/setInterval: 첫 번째 인자로 함수를 전달하고, 두 번째 인자로 시간을 설정한다. addEventListener와 마찬가지로 첫 번째 인자로 전달된 함수는 바로 실행되지 않고 두 번째 인자로 전달한 시간만큼 기다렸다가 실행된다.
+   - XMLHttpRequest(XHR): 과거에는 서버와 통신을 할 때 form을 사용했다고 한다. form은 동기 방식으로 작동하기 때문에 데이터를 주고 받는 과정에서 페이지 리로드가 생기고 이는 효율적이지 않다.
+
+   위의 예시들처럼 코드의 실행이 완료되기 전에 다른 작업을 수행할 수 있고, 인자로 함수를 넘겨 해당 코드의 실행이 완료되면 실행하는 목적의 함수를 콜백함수라고 한다.
+
+2. Promise
+   Promise는 함수형 프로그래밍을 공부하면서 간단하게 정리한 게 있어서 [링크](https://jeongki.dev/post/%EB%8D%B0%EB%B8%8C%EC%BD%94%EC%8A%A4-10%EC%9D%BC%EC%B0%A8-til%ED%95%A8%EC%88%98%ED%98%95-%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D%EC%97%90%EC%84%9C%EC%9D%98-promise)를 참고하면 좋을 것 같다.
+
+3. async & await
+   Promise는 콜백의 단점을 해결했지만 코드의 실행순서가 위에서 아래에서 실행되는 자바스크립트의 흐름과 다르다.
+
+   ```javascript
+   const delay = (time) => {
+     return new Promise((resolve) => setTimeout(resolve, time));
+   };
+   function test() {
+     console.log("start");
+     delay(1000).then(() => console.log("done"));
+     console.log("end");
+   }
+   ```
+
+   위의 코드를 실행하면 'start'가 출력되고, 1초뒤에 'done' 문자열이 출력되고 마지막으로 'end'가 출력될 것 같지만 실제로는 start -> end -> done 순서로 실행된다. 코드의 흐름이 위에서 아래로 내려왔다가 다시 위로 올라가기 때문에 직관적으로 알아보기 어렵다. 이를 해결하기 위해 async와 await 키워드를 사용한다.
+
+   ```javascript
+   async function test() {
+     console.log("start");
+     await delay(1000);
+     console.log("done");
+     console.log("end");
+   }
+   test();
+   // start
+   // done
+   // end
+   ```
+
+   function 키워드를 사용한 경우 function 키워드 앞에 async를 붙여서 사용한다. 화살표 함수의 경우 아래와 같이 사용할 수 있다.
+
+   ```javascript
+   const asyncFunc = async () => {
+     // ...
+   };
+   ```
+
+   async&await를 사용하면 Promise를 동기 코드처럼 보이게 코드를 짤 수 있다. 실행은 여전히 비동기로 실행된다.
+
+   > 궁금한 점
+   > 코드가 비동기로 실행된다고 하는데 순차적으로 실행되기 때문에 동기적으로 실행되는게 아닌가 생각했다. 아마 여기서 비동기로 실행된다는 것은 async 함수 외부에 실행할 코드가 있으면 실행된다는 의미인 것 같다. (확실하지 않음)
+
+   async로 감싼 함수는 실행 결과를 Promise로 반환한다.
+
+## 정리
+
+import/export 를 당연하게 쓰고 있었는데 공부하게 돼서 좋았다. 비동기 처리하는 방법도 막연하게 알고 있었는데 자세하게 공부할 수 있어서 뿌듯하다.
+
+## 참고자료
+
+자바스크립트 ES6 모듈 내보내기/불러오기 https://www.daleseo.com/js-module-import/  
+모듈 https://poiemaweb.com/es6-module  
+[자바스크립트] ES6(ECMA Script6) - export, import https://beomy.tistory.com/22  
+[자바스크립트] 비동기 처리 1부 - Callback https://www.daleseo.com/js-async-callback/  
+MDN XMLHttpRequest https://developer.mozilla.org/ko/docs/Web/API/XMLHttpRequest  
+[자바스크립트] 비동기 처리 3부 - async/await https://www.daleseo.com/js-async-async-await/
