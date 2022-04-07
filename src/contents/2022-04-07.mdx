@@ -1,0 +1,119 @@
+---
+title: "[데브코스] 14일차 TIL (history api)"
+description: history api에 대해서
+tag: [공부, 자바스크립트, javascript, 데브코스, TIL, history]
+date: 2022-04-07
+---
+
+## 들어가며
+
+오늘은 싱글 페이지 어플리케이션(SPA)를 만들기 위해서 꼭 알아둬야 할 _history api_ 에 대해 공부했다.  
+리액트로 개발할 때 필수적으로 _react-router-dom_ 이라는 라이브러리를 사용해 라우팅 기능을 구현했었다. _react-router-dom_ 내부적으로 브라우저의 _history api_ 를 사용한다고 해서 순수 자바스크립트로 튜토리얼을 따라 라우팅을 구현한 적이 있었다. 이 때는 혼자 공부하다보니 뭔가 더 어려운 것 같고 이해도 안되는 느낌이었는데, 강의를 들으니까 갑자기 이해가 쏙쏙 되는 느낌이다.
+
+## History Api
+
+History Api는 브라우저의 세션 기록, 즉 현재 페이지를 불러온 탭 또는 프레임의 방문 기록을 조작하는 방법을 제공한다. 브라우저에서 페이지 로딩을 하면 **세션 히스토리**를 가지게 되는데, 세션 히스토리는 페이지 이동을 할 때마다 쌓이게 되고, 이를 통해 뒤로 가기 또는 앞으로 가기 기능을 사용할 수 있다.
+
+History 객체는 세션 히스토리를 조작할 수 있는 다양한 메서드를 가지고 있다.
+
+1. History.go()
+   현재 페이지를 기준으로, 상대적인 위치에 존재하는 세션 히스토리 내 페이지로 이동하는 비동기 메서드이다. 예를 들어, 매개변수로 -1을 넣으면 바로 뒤로, 1을 넣으면 바로 앞으로 이동한다. 세션 히스토리를 벗어나는 값을 제공하면 아무 일도 일어나지 않고, 매개변수를 제공하지 않거나 0을 제공하면 현재 페이지를 다시 불러온다.
+2. History.back()
+   세션 히스토리의 바로 뒤 페이지로 이동하는 비동기 메서드이다. 브라우저의 뒤로 가기 버튼을 눌렀을 때, history.go(-1)과 같은 동작을 한다.
+3. History.forward()
+   세션 히스토리의 바로 앞 베이지로 이동하는 비동기 메서드이다. 브라우저의 앞으로 가기 버튼을 눌렀을 때, history.go(1)과 같은 동작을 한다.
+
+앞에서 소개한 메서드들은 이미 저장되어 있는 세션 히스토리 내에서 이동할 수 있는 메서드들이다. 싱글 페이지 어플리케이션을 만들기 위해 중요한 것은 세션 히스토리에 새로운 url 상태를 쌓는 것이다. 이를 위해 History의 _pushState()_, _replaceState()_ 메서드를 사용한다.
+
+4. History.pushState()
+   브라우저의 세션 히스토리 스택에 상태를 추가한다.
+   ```javascript
+   history.pushState(state, title[, url]);
+   ```
+   총 세 개의 매개변수를 받을 수 있다.
+   - state: 새로운 세션 히스토리 항목에 연결할 상태 객체이다. 사용자가 새로운 상태로 이동하면 _popstate_ 이벤트가 발생하는데 이 때 이벤트 객체의 _state_ 속성에 해당 상태가 담기게 된다.
+   - title: 새로 추가될 url의 제목을 설정한다. 현재는 사파리를 제외한 모든 브라우저에서 지원하지 않는다.
+   - url: 세션 히스토리에 추가할 url이다. 만약 값을 입력하지 않으면 현재 url로 세션 히스토리에 추가된다. url이 변경된다고 해서 화면이 리로드 되진 않는다.
+5. History.replaceState()
+   ```javascript
+   history.replaceState(state, title[, url]);
+   ```
+   전체적인 동작은 _pushState()_ 와 같다. 다른 점은 세션 히스토리에 새로운 url을 추가하지 않고, 현재 url을 대체한다.
+   만약 게시물을 작성하는 페이지가 있을 때, 작성 완료 버튼을 눌러 작성된 게시물 페이지로 넘어간다고 하자. 이 때 _pushState()_ 를 사용하게 되면 뒤로 가기 버튼을 눌렀을 때 다시 게시물 작성 페이지로 돌아가게 된다. 이런 상황에서 _replaceState()_ 를 사용하게 되면 작성된 게시물 페이지에서 뒤로 가기를 눌렀을 때 다시 게시물 작성 페이지로 돌아가지 않게 된다.
+
+> 주의할 점
+>
+> _pushState()_ 나 _replaceState()_ 를 사용해서 url을 추가하고 새로고침을 하면 404 에러가 뜬다. 만약 _/_ root에서 _/product_ 라는 url을 추가한 상황이라면 새로고침을 했을 때 _/product.html_ 또는 _/product/index.html_ 파일을 요청하게 된다. 지금은 세션 히스토리에 url 추가만 하고 실제 파일은 없기 때문에 에러가 발생하는 것이다.
+>
+> SPA를 만들 때 이러한 문제가 발생하지 않도록 404 에러가 났을 경우 index.html로 요청을 돌려주는 처리가 필요하다.
+
+## React-Router
+
+리액트를 맛 본 사람이라면 한 번쯤 써봤을 법한 라우팅 라이브러리이다. 내부적으로 **History api** 를 사용한다는 건 알고 있었는데 도대체 어떻게 쓰고 있을까 궁금해서 큰 맘 먹고 코드를 살펴보기로 했다. 그런데 _pushState()_ 나 _replaceState()_ 는 보이지 않았고, 최상위에서 _history_ 라는 라이브러리를 가져오고 있었다.
+
+```javascript
+// react-router/packages/react-router-dom/index.tsx
+import * as React from "react";
+import type { BrowserHistory, HashHistory, History } from "history";
+import { createBrowserHistory, createHashHistory } from "history";
+```
+
+그럼 [history 라이브러리](https://github.com/remix-run/history/tree/3e9dab413f4eda8d6bce565388c5ddb7aeff9f7e)는 뭘까? 깃허브의 리드미를 읽어보면 세션 히스토리를 쉽게 관리하기 위한 히스토리 라이브러리라고 한다. 여기서 _pushState()_ 와 _replaceState()_ 를 찾아보자.
+
+```javascript
+// history/packages/history/index.ts
+...
+export function createBrowserHistory(...){
+	...
+	let globalHistory = window.history;
+	...
+	function push(to: To, state?: any) {
+		let nextAction = Action.Push;
+		let nextLocation = getNextLocation(to, state);
+		function retry() {
+			push(to, state);
+		}
+		if (allowTx(nextAction, nextLocation, retry)) {
+			let [historyState, url] = getHistoryStateAndUrl(nextLocation, index + 1);
+			try {
+				globlHistory.pushState(historyState, "", url); // 여기!
+			} catch (error) {
+				window.location.assign(url);
+			}
+		}
+		applyTx(nextAction);
+	}
+}
+```
+
+push 함수에서 _pushState()_ 메서드를 사용하는 걸 확인할 수 있었다. push 함수 뿐 아니라 replace, go 등의 함수를 정의해두고 history 라는 객체를 만들어 객체를 반환하고 있었다.
+
+```javascript
+let history = {
+	...
+	push,
+	replace,
+	go,
+	back() {
+		go(-1);
+	},
+	forward() {
+		go(1);
+	}
+	...
+}
+
+return history;
+```
+
+아마 여기서 반환하는 history 객체가 react-router-dom 에서 사용하는 history 객체인 것 같다.
+
+## 정리
+
+예전부터 흥미가 있었던 history api를 사용해 간단한 라우팅 기능을 구현해서 재미있었다. 이미 만들어 둔 라이브러리에서 history api를 어떻게 사용하는지 확인하는 것도 재미있었다. 물론 코드 이해는 정말 못하지만... 결국 기초를 공부하는 게 나중에 프레임워크나 라이브러리를 사용할 때 필요하다는 걸 느꼈다.
+
+## 참고자료
+
+mdn History https://developer.mozilla.org/ko/docs/Web/API/History  
+react-router https://github.com/remix-run/react-router  
+history https://github.com/remix-run/history/tree/3e9dab413f4eda8d6bce565388c5ddb7aeff9f7e
