@@ -85,7 +85,7 @@ export default function DetailPage({ data }) {
             ul: MDXDesign.Ul,
             em: MDXDesign.Em,
             li: MDXDesign.Li,
-            img: MDXDesign.Img,
+            // img: MDXDesign.Img,
           }}
         >
           <MDXRenderer frontmatter={data.mdx.frontmatter}>

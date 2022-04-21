@@ -39,24 +39,8 @@ module.exports = {
     {
       resolve: "gatsby-plugin-mdx",
       options: {
-        plugins: [
-          {
-            resolve: "gatsby-remark-images",
-            options: {
-              maxWidth: 800,
-              backgroundColor: "#fff",
-            },
-          },
-        ],
-        gatsbyRemarkPlugins: [
-          {
-            resolve: "gatsby-remark-images",
-            options: {
-              maxWidth: 800,
-              backgroundColor: "#fff",
-            },
-          },
-        ],
+        gatsbyRemarkPlugins: [`gatsby-remark-images`],
+        plugins: [`gatsby-remark-images`],
       },
     },
     {
