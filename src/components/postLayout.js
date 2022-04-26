@@ -3,11 +3,12 @@ import { MDXProvider } from "@mdx-js/react";
 import { MDXRenderer } from "gatsby-plugin-mdx";
 import React from "react";
 import Layout from "./layout";
-import "./postLayout.module.css";
+import { commentsContainer } from "./postLayout.module.css";
 import * as MDXDesign from "./markdown-react-component";
 import CodeBlock from "./CodeBlock";
 import { Helmet } from "react-helmet";
 import Thumbnail from "../images/blog-thumbnail.jpg";
+import Utterances from "./Utterances";
 
 export default function DetailPage({ data }) {
   return (
@@ -93,6 +94,9 @@ export default function DetailPage({ data }) {
           </MDXRenderer>
         </MDXProvider>
       </main>
+      <div className={commentsContainer}>
+        <Utterances />
+      </div>
     </Layout>
   );
 }
