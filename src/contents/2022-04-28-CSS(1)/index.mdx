@@ -1,0 +1,151 @@
+---
+title: "[데브코스] 29일차 TIL (Float, Position, Flex)"
+description: CSS를 소중히 여기자! (1)
+tag: [데브코스, 공부, TIL, CSS, float, position, flex]
+date: 2022-04-28
+---
+
+## 들어가며
+
+오늘은 CSS 강의 첫날이었다. 요즘 CSS의 필요성을 느끼고 있었는데 마침 CSS 강의를 들을 수 있어서 좋았다. 어제 블로그 포스팅하면서 [코드펜](https://codepen.io) 을 처음 써봤는데 CSS 강의 실습을 코드펜으로 진행해서 신기했다.
+
+## Float
+
+CSS _float_ 속성은 한 요소가 흐름으로부터 빠져나와 텍스트 및 인라인 요소가 그 주위를 감싸는 자기 컨테이너의 좌측 또는 우측으로 배치되도록 설정한다. 예전에는 수평정렬을 위해 사용했다. 아래의 예시를 통해 확인해보자.
+
+<iframe
+  width="100%"
+  height="300"
+  style="width: 100%;"
+  scrolling="no"
+  title="Untitled"
+  src="https://codepen.io/qq8721443/embed/NWyKWpq?default-tab=html%2Cresult"
+  frameborder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowfullscreen="true"
+>
+  See the Pen <a href="https://codepen.io/qq8721443/pen/NWyKWpq">Untitled</a> by
+  Jeongki (<a href="https://codepen.io/qq8721443">@qq8721443</a>) on{" "}
+  <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
+컨테이너를 만들고 그 안에 아이템이 있다고 해보자. 각각의 아이템에 _float: left_ 속성을
+적용하면 아이템이 수평정렬 되는 것을 볼 수 있다. 그런데 이렇게 했을 때 컨테이너가
+아이템 요소들을 감싸고 있지 않다. _float_ 을 설정 했을 때, _float_ 이 설정된 요소는
+높이 값을 인지하지 못하기 때문이다. 이를 해결하기 위해 _float_ 속성을 해제해야 한다.
+_float_ 을 해제할 때 권장되는 방법은 _::after_ 를 사용해 가상요소를 만들어 처리하는
+것이다.{" "}
+
+<iframe
+  width="100%"
+  height="300"
+  style="width: 100%;"
+  scrolling="no"
+  title="Untitled"
+  src="https://codepen.io/qq8721443/embed/NWyKWYx?default-tab=html%2Cresult"
+  frameborder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowfullscreen="true"
+>
+  See the Pen <a href="https://codepen.io/qq8721443/pen/NWyKWYx">Untitled</a> by
+  Jeongki (<a href="https://codepen.io/qq8721443">@qq8721443</a>) on{" "}
+  <a href="https://codepen.io">CodePen</a>.
+</iframe>
+_::after_ 는 해당 태그의 제일 마지막에 가상요소를 추가해준다. 그 가상요소에 _display:
+block_ 과 _clear: both_ 를 사용해 _float_ 을 해제하면 된다. float 속성은 블록 레이아웃의
+사용을 뜻하기 때문에 display 값을 수정할 수 있다. flex, inline-flex, grid 를 제외한
+모든 display 값을 block으로 수정한다.
+
+## Position
+
+요소의 위치 지정 특성을 설정하는 속성이다. position 값은 기본적으로 static으로 설정되어 있다. static 외에 relative, absolute, fixed, sticky를 사용할 수 있다.
+
+- static: 요소를 일반적인 문서 흐름에 따라 배치한다.
+- relative: 요소를 일반적인 문서 흐름에 따라 배치하고, 자기 자신을 기준으로 top, right, bottom, left 값에 따라 오프셋을 적용한다.
+- absolute: 요소를 일반적인 문서 흐름에서 제거하고, 페이지 레이아웃에 공간을 배정하지 않는다. 대신 가장 가까운 **위치 지정 조상 요소**에 대해 상대적으로 배치한다. 조상 중 위치 지정 조상 요소가 없다면 최상위 요소를 기준으로 삼는다.
+  > 위치 지정 조상 요소
+  > position 값이 relative, absolute, fixed, sticky 중 하나인 요소이다.
+- fixed: 요소를 일반적인 문서 흐름에서 제거하고, 페이지 레이아웃에 공간을 배정하지 않는다. 뷰포트의 최기 컨테이닝 블록을 기준으로 삼아 배치한다. 단, 요소의 조상 중 하나가 transform, perspective, filter 속성 중 어느 하나라도 none 이 아니라면 뷰포트 대신 그 조상을 컨테이닝 블록으로 삼는다.
+- sticky: 요소를 일반적인 문서 흐름에 따라 배치하고 테이블 관련 요소를 포함해 가장 가까운, 스크롤 되는 조상과, 표 관련 요소를 포함한 컨테이닝 블록을 기준으로 오프셋을 적용한다. 해당 오프셋을 넘으면 fixed 처럼 화면에 고정된다. (말이 너무 어려운 것 같다.)
+
+> 쌓임 맥락이란?
+> 가상의 Z축을 사용한 HTML 요소의 3차원 개념이다. 요소들이 가징 특정 속성으로 인해 쌓임 맥락이 생성되는데 관련 문서를 참고하면 좋을 것 같다. 쌓임 맥락이 생성되는 조건이 엄청 많다. [mdn 쌓임 맥락](https://developer.mozilla.org/ko/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context)
+
+## Flex
+
+1차원 레이아웃을 구현하기 위해 사용한다. _display: flex_ 를 사용해 구현할 수 있는데 해당 속성이 적용된 요소를 flex container, 해당 요소의 자식 요소들을 flex items 라고 한다.
+flex는 flex 와 inline-flex 로 나뉘어지는데 flex container가 _display: block_ 으로 동작하는지 _display: inline_ 으로 동작하는지에 따라 사용하면 된다.
+
+<iframe
+  width="100%"
+  height="300"
+  style="width: 100%;"
+  scrolling="no"
+  title="Untitled"
+  src="https://codepen.io/qq8721443/embed/eYVOmOM?default-tab=html%2Cresult"
+  frameborder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowfullscreen="true"
+>
+  See the Pen <a href="https://codepen.io/qq8721443/pen/eYVOmOM">Untitled</a> by
+  Jeongki (<a href="https://codepen.io/qq8721443">@qq8721443</a>) on{" "}
+  <a href="https://codepen.io">CodePen</a>.
+</iframe>
+
+위에서 float을 설명했던 구조와 같이 HTML을 구성하고 container에 _display: flex_ 속성을 적용했다. 위에서 float 를 사용한 결과와 동일한 것을 볼 수 있다. item 요소는 div 태그인데 어떻게 수평정렬이 된 것일까?  
+flex container 에는 _flex-direction_ 이라는 속성을 적용할 수 있다. 이 값은 컨테이너 내의 아이템을 어떤 축을 기준으로 정렬할지 선택하는데 기본값이 _row_ 이기 때문에 가로축 기준으로 정렬되었다. _column_ 으로 설정하면 아이템이 세로축 기준으로 정렬된다. _flex-direction_ 처럼 flex container 에 적용할 수 있는 속성들이 있다.
+
+- flex-wrap: 이 속성은 줄바꿈 처리와 관련이 있다. _nowrap_, _wrap_, _wrap-reverse_ 값이 있는데 아이템이 컨테이너 크기를 벗어났을 때 줄바꿈 처리를 할 것인지를 정한다.
+- justify-content: 주축의 정렬방식을 설정한다. 기본값은 _flex-start_ 이고 _flex-end_, _center_, _space-between_, _space-around_ 값이 있다.
+- align-items: 교차축의 정렬방식을 설정한다. 기본값은 _stretch_ 이고, _flex-start_, _flex-end_, _center_, _baseline_ 값이 있다.
+- align-content: 교차축에 두 줄 이상 아이템이 쌓였을 때 동작한다. 기본값은 _stretch_ 이고, _flex-start_, _flex-end_, _center_, _space-between_, _space-around_ 값이 있다.
+
+flex 아이템에만 적용할 수 있는 속성도 있다.
+
+- flex-grow: 아이템의 증가 너비 비율을 설정한다. 기본값은 0으로 설정되어 있는데, 해당 값이 0이 아닌 값으로 설정되어 있으면 아이템의 기본 너비만큼 공간을 차지하고 남은 공간을 flex-grow 비율 만큼 나눠 가진다.
+  {" "}
+  <iframe
+    width="100%"
+    height="300"
+    style="width: 100%;"
+    scrolling="no"
+    title="Untitled"
+    src="https://codepen.io/qq8721443/embed/rNJBapo?default-tab=html%2Cresult"
+    frameborder="no"
+    loading="lazy"
+    allowtransparency="true"
+    allowfullscreen="true"
+  >
+    See the Pen <a href="https://codepen.io/qq8721443/pen/rNJBapo">Untitled</a>{" "}
+    by Jeongki (<a href="https://codepen.io/qq8721443">@qq8721443</a>) on{" "}
+    <a href="https://codepen.io">CodePen</a>.
+  </iframe>
+  모든 아이템에 _flex-grow: 1_ 로 설정했기 때문에 기본 너비인 100px 만큼 공간을 할당하고
+  남은 공간을 같은 비율로 나눠 가지기 때문에 빈 공간을 같은 너비로 꽉 채우고 있다.
+  만약 첫 번째와 세 번째 아이템은 1로 설정하고 두 번째 아이템만 2로 설정하면 남은
+  공간을 1:2:1의 비율로 나눠가지기 때문에 두 번째 아이템의 너비가 더 클 것이다. 값을
+  0으로 설정하면 기본 너비 외에 더 넓어지지 않는다.
+- flex-shrink: 아이템의 감소 너비 비율을 설정한다. 기본값은 1이다. 이 속성은 아이템이 감소하냐 안하냐를 제어하는 용도로 사용한다. 0일 경우 아이템은 기본 너비를 유지하고 1일 경우 기본 너비보다 작아질 수 있다.
+- flex-basis: 아이템의 기본 너비를 설정한다. 기본값은 auto이다. 값이 auto가 아닌 값이면 아이템에 기본으로 설정된 너비는 무시된다. 어디에 써야할 지는 잘 모르겠다.
+- flex: 위에서 살펴 본 _flex-grow_, _flex-shrink_, _flex-basis_ 속성의 단축 속성이다.
+  ```css
+  /* flex: flex-grow flex-shrink flex-basis */
+  flex: 1 1 auto;
+  ```
+  flex-grow, flex-shrink, flex-basis 순서대로 입력하면 된다. 값을 생략하면 각 속성의 기본값이 적용되는데 flex-basis를 생략하면 기본값인 **auto 속성으로 적용되는 것이 아니라 0으로 적용**되기 때문에 이 부분 조심해야한다.
+- order: 아이템의 순서를 설정한다. 기본값은 0이고 값이 커질수록 요소가 뒤로 배치된다.
+- align-self: align-items 속성을 개별 아이템에 적용할 수 있다. align-items가 가질 수 잇는 모든 값을 가질 수 있다. 기본값은 auto 이다.
+- gap: 아이템 사이의 간격을 설정한다. 최신 브라우저에서만 지원하기 때문에, 하위 브라우저에서는 margin을 사용해 구현해야 한다.
+
+## 정리
+
+CSS가 생각보다 공부할 게 엄청 많은 걸 느꼈다. 지금까지 CSS는 대충 공부하고 자바스크립트에 많이 투자 했었는데 앞으로는 CSS도 열심히 공부해야겠다. flex를 사용하면서 단축 속성인 flex만 사용했는데 다른 속성이 있다는 걸 이번에 처음 알고 반성했다. 실습을 진행하면서 Emmet 문법에 대해 알게 되었는데 HTML 작성하는게 너무 편해졌다. CRA로 생성한 리액트에서 jsx 파일 내에서도 사용할 수 있었다! 세상엔 내가 모르는 게 정말 많다. 모르는 게 많다는 건 성장할 기회도 많다는 거겠지?
+
+## 참고자료
+
+https://developer.mozilla.org/ko/docs/Web/CSS/float
+https://developer.mozilla.org/ko/docs/Web/CSS/position
+https://developer.mozilla.org/ko/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context
