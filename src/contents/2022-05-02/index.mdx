@@ -1,0 +1,248 @@
+---
+title: "[데브코스] 30일차 TIL (Grid)"
+description: CSS를 소중히 여기자! (2)
+tag: [데브코스, 공부, TIL, CSS, grid]
+date: 2022-05-02
+---
+
+## 들어가며
+
+원래는 강의를 듣고 키워드만 정리하고, 강의 다 끝나면 정리했던 키워드 보면서 머릿속으로 정리하면서 글을 작성하는데 오늘은 강의를 들으면서 내용을 정리하고 바로바로 공부해보기로 했다. 과연 얼마나 도움이 될 지 궁금하구만.
+
+## Grid
+
+1차원 레이아웃을 구성하는 Flex와 다르게 Grid는 2차원 레이아웃을 구현하기 위해 사용한다. 간단하게 _display: grid_ 속성을 사용해 정의할 수 있고, 해당 속성이 정의 된 요소를 Grid Container, 요소의 자식 요소들을 Grid Items라고 한다. Flex와 마찬가지로 grid와 inline-grid가 있다. 요소 내부는 Grid로 동작하지만 요소 자체는 block으로 동작하는지 inline으로 동작하는지 설정한다.
+
+그리드는 2차원이기 때문에 행과 열을 가지고 있다. 행, 열의 개수와 너비를 설정하기 위해 _grid-template-rows_, _grid-template-columns_ 를 사용한다.
+
+1. grid-template-rows: 각 행의 너비와 전체 행의 개수를 설정한다.
+
+2. grid-template-columns: 각 열의 너비와 전체 열의 개수를 설정한다.
+
+<iframe
+  width="100%"
+  height="300"
+  style="width: 100%;"
+  scrolling="no"
+  title="grid-template-"
+  src="https://codepen.io/qq8721443/embed/ExQYXKX?default-tab=html%2Cresult"
+  frameborder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowfullscreen="true"
+></iframe>
+
+_display: grid_ 속성을 정의한 컨테이너에 두 가지 속성을 정의했다.
+
+```css
+grid-template-rows: 100px 100px 100px;
+```
+
+먼저 행의 개수와 크기를 설정했다. 위의 코드는 각 행의 크기를 100px로 하고 총 3개의 행을 만든다는 의미이다.
+
+```css
+grid-template-columns: 1fr 1fr;
+```
+
+같은 방법으로 열의 개수와 크기를 설정할 수 있다. 여기서 너비의 단위로 fr을 사용했는데 fraction의
+
+약자로 공간을 일정 비율로 나눠서 차지할 지 정할 수 있다. 열을 두 개로 설정했는데 각 열의 너비가 1fr이기 때문에 같은 비율로 나눠서 공간을 차지하게 된다.
+
+만약 같은 값이 여러 번 반복되면 코드를 작성하기 불편할 것이다. 이때 _repeat()_ 이라는 함수를 사용할 수 있다.
+
+```css
+grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+```
+
+위와 같이 10개의 행을 정의하게 되면 반복되는 코드가 많이 때문에 비효율적이다.
+
+```css
+grid-template-rows: repeat(10, 1fr);
+```
+
+간단하게 위와 같이 정의할 수 있다. 첫 번째 인자로 반복할 횟수, 두 번째 인자로 너비 값을 사용한다.
+
+_grid-template-_ 을 사용해 행과 열을 정의하는 건 명시적으로 정의한다고 한다. 명시적으로 정의하는 건 뭘까? 그럼 암시적으로 정의하는 것도 있나? 아래를 통해 살펴보자.
+
+<iframe
+  width="100%"
+  height="300"
+  style="width: 100%;"
+  scrolling="no"
+  title="grid-auto-"
+  src="https://codepen.io/qq8721443/embed/eYVORLG?default-tab=html%2Cresult"
+  frameborder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowfullscreen="true"
+></iframe>
+
+코드를 보면 행의 개수는 2, 너비는 100px, 열의 개수는 2, 너비는 1fr로 설정했다. 결과를 보면 2행까지는 제대로 스타일이 적용되지만 3번째 행인 5번, 6번 아이템에는 적용되지 않았다. 5, 6번 아이템은 명시적으로 정의되지 않았기 때문에 스타일이 적용되지 않는다. 이런 상황에서 암시적으로 정의할 수 있는 속성으로 _grid-auto-_ 가 있다.
+
+<iframe
+  width="100%"
+  height="300"
+  style="width: 100%;"
+  scrolling="no"
+  title="Untitled"
+  src="https://codepen.io/qq8721443/embed/jOZNLNm?default-tab=html%2Cresult"
+  frameborder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowfullscreen="true"
+></iframe>
+
+컨테이너에 _grid-auto-rows: 100px_ 을 설정했다. 3번째 행에도 스타일이 적용되는 것을 확인할 수 있다.
+
+그리드 아이템이 쌓이는 방향을 정의할 때 _grid-auto-flow_ 속성을 사용한다. 기본값은 _row_ 이고 _column_ 값을 사용할 수 있다. 아이템을 쌓는 과정에서 빈 공간을 채우고 싶을 때 _grid-auto-flow: dense_ 속성을 사용할 수 있다. 주의할 점은 이렇게 사용했을 때 쌓이는 방향이 row로 생략되어 있기 때문에 column으로 dense 를 사용하고 싶다면 _grid-auto-flow: column dense_ 와 같이 사용하면 된다.
+
+### 정렬
+
+그리드 컨테이너 내에 컨텐츠를 제외한 남은 공간이 있을 때 행과 축을 정렬할 수 있다. _justify-content_, _align-content_ 속성을 사용할 수 있는데 justify-content는 행 축에 대한 정렬, align-content는 열 축에 대한 정렬을 설정할 수 있다.
+
+```css
+justify-content: normal, stretch, start, end, center, space-between, space-around, space-evenly
+align-content: normal, stretch, start, end, center, space-between, space-around, space-evenly
+```
+
+justify-content와 align-content가 가질 수 있는 값은 같다. 기본값은 normal로 stretch와 같은 동작을 한다.
+
+- normal: stretch와 같음
+
+- stretch: 아이템을 최대 너비로 늘린다.
+
+- start: 행 축 또는 열 축의 시작 위치로 정렬한다.
+
+- end: 행 축 또는 열 축의 끝 위치로 정렬한다.
+
+- center: 행 축 또는 열 축의 가운데 위치로 정렬한다.
+
+- space-between: 축의 시작과 끝에 아이템을 정렬하고 남은 공간을 나머지 아이템이 균등하게 나눠가지도록 정렬한다.
+
+- space-around: 각 아이템의 양 옆 공간을 똑같이 나눠 정렬한다.
+
+- space-evenly: 각 아이템을 제외한 공간의 너비가 같도록 정렬한다.
+
+위에서 설명한 속성은 각 셀을 정렬하는 방법이고, 셀 내부에 남는 공간이 있다면 셀 내부의 아이템을 정렬할 수도 있다.
+
+```css
+justify-items: normal, stretch, start, center, end
+align-items: normal, stretch, start, center, end
+```
+
+마찬가지로 justify-items와 align-items가 가질 수 있는 값은 같다.
+
+- normal: stretch와 같다.
+
+- stretch: 아이템을 최대 너비로 늘린다.
+
+- start: 셀의 시작 위치에 아이템을 정렬한다.
+
+- end: 셀의 끝 위치에 아이템을 정렬한다.
+
+- center: 셀의 가운데 위치에 아이템을 정렬한다.
+
+지금까지는 그리드 컨테이너에서 요소를 정렬하는 방법을 알아봤다. 그리드 아이템 하나에 정렬 속성을 정의할 수도 있는데 이때 _justify-self_ 와 _align-self_ 속성을 사용하면 된다.
+
+### 요소 배치
+
+요소를 배치할 때 _grid-area_ 를 사용해 각 요소에 이름을 지정할 수 있고, _grid-template-areas_ 를 사용해 원하는 위치에 요소를 배치할 수 있다. 예시를 보자.
+
+<iframe
+  width="100%"
+  height="300"
+  style="width: 100%;"
+  scrolling="no"
+  title="Untitled"
+  src="https://codepen.io/qq8721443/embed/bGLbrEB?default-tab=html%2Cresult"
+  frameborder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowfullscreen="true"
+></iframe>
+
+컨테이너 안에 각 요소들을 정의하고 각 요소에 _grid-area_ 를 사용해 이름을 정할 수 있다. 예시에서 행은 4개이고 열은 3개이다. _grid-template-area_ 에 각 행 마다 문자열로 구분해서 표현하고 문자열 내에서 공백을 통해 열을 구분할 수 있다. none(또는 .) 을 사용해 해당 위치에는 아무 요소도 배치하지 않을 수 있다.
+
+_grid-row-start_, _grid-row-end_, _grid-column-start_, _grid-column-end_ 속성을 사용해서 요소를 배치할 수도 있다.
+
+요소의 기본 시작 라인과 끝 라인이 있는데 이를 직접 정해줄 수 있다.
+
+<iframe
+  width="100%"
+  height="300"
+  style="width: 100%;"
+  scrolling="no"
+  title="Untitled"
+  src="https://codepen.io/qq8721443/embed/bGLbrEB?default-tab=html%2Cresult"
+  frameborder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowfullscreen="true"
+></iframe>
+
+원래 요소의 위치는 컨테이너의 왼쪽 상단이었다. 그런데 _grid-row-start_ 속성을 2로 설정하고 _grid-column-start_ 속성을 3으로 설정해서 행 축 기준 두 번째 라인, 열 축 기준 3번째 라인부터 한 줄씩 차지하기 때문에 요소의 위치가 변경된다. _grid-row-_ 속성과 _grid-column-_ 속성은 단축 속성으로 사용할 수도 있다. start와 end를 제외하고 _grid-row_ 와 _grid-column_ 을 사용하면 start와 end 값을 동시에 지정할 수 있다.
+
+```css
+grid-row: 1/3;
+grid-column: 2/4;
+```
+
+/ 앞이 start 값이고, 뒤가 end 값이다.
+
+### 그리드 함수
+
+그리드에서 사용할 수 있는 함수가 있다. 앞에서 반복되는 값을 정의할 때 사용한 _repeat_ 이 그 예시이다.
+
+- minmax: 최솟값과 최댓값을 정의한다. 보통 repeat 함수 내에서 사용된다.
+
+  ```css
+  grid-template-rows: repeat(3, minmax(100px, 1fr));
+  ```
+
+  위와 같이 사용할 수 있는데 한 행의 크기가 최소 100px, 최대 1fr이 되도록 3개의 행을 설정한다.
+
+- fit-content: 그리드 아이템의 너비를 컨텐츠의 크기에 맞추는 함수이다. 인자로 너비 값을 전달하는데 해당 너비 값보다 작을 경우 아이템의 너비를 컨텐츠의 크기로 맞추고, 아이템의 너비가 인자값보다 작으면 인자값으로 너비를 설정한다.
+
+### 단위
+
+그리드에서 사용하는 단위에는 _fr_ 과 _min-content_, _max-content_ 가 있다.
+
+- fr: 앞에서 사용했던 단위로 사용 가능한 공간을 일정 비율로 나눌 때 사용한다.
+
+- min-content: 컨텐츠의 최소 너비를 아이템의 너비로 사용한다.
+
+- max-content: 컨텐츠의 최대 너비를 아이템의 너비로 사용한다.
+
+> min-content 사용 시 주의할 점  
+> min-content를 사용할 때 한국어, 중국어, 일본어 (CJK) 를 사용하면 단어 기준으로 줄바꿈이 일어나지 않고, 문자를 기준으로 줄바꿈이 일어난다. 영어와 CJK 언어의 단어의 기준이 다르기 때문인데 이를 해결하기 위해 _word-break: keep-all_ 속성을 사용한다.
+
+<iframe
+  width="100%"
+  height="300"
+  style="width: 100%;"
+  scrolling="no"
+  title="fit-content"
+  src="https://codepen.io/qq8721443/embed/wvyvmgO?default-tab=html%2Cresult"
+  frameborder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowfullscreen="true"
+></iframe>
+
+- auto-fill: 아이템의 너비를 지정할 수 있는 최소 너비로 설정한다. minmax의 최솟값을 기준으로 한다.
+
+- auto-fit: 아이템의 너비를 지정할 수 있는 최대 너비로 지정한다. minmax의 최댓값을 기준으로 한다.
+
+## 정리
+
+지금 사용하는 블로그 메인을 그리드를 사용해 만들었었다. 만들 당시에는 블로그 글을 찾아보면서 그리드에 대한 이해 없이 구현만 하기 바빠서 의도한 대로 동작하지 않았을 때 여러 개의 속성을 마구잡이로 지정하면서 문제가 해결될 때까지 무지성으로 코드를 수정했었다. 이번 그리드 강의를 들으면서 그때 왜 그런 오류가 났는지 이해할 수 있었고, 머릿속에 떠다니던 그리드에 대한 개념이 정리된 것 같다.
+
+이번에는 강의 하나를 들을 때마다 배운 내용을 정리했는데 이렇게 하니까 너무 많은 내용을 자세하게 정리하게 되는 것 같아 시간이 오래 걸렸다. 꼼꼼하게 정리하는 건 좋은데 시간이 너무 오래 걸려서 어떤 식으로 정리하는 게 좋을지 고민해봐야겠다.
+
+## TMI
+
+데브코스가 시작하고 의도치 않게 주말마다 크고 작은 행사가 있어서 주말에는 공부를 제대로 못했다. 일요일 저녁에 슬랙을 보면 수많은 TIL이 쌓여있는데, 이걸 보면 자괴감이 밀려온다. 그래도 열심히 하시는 분들 덕분에 조금이라도 더 자극을 받게 되는 것 같다. 데브코스의 장점을 오늘도 느낀다..!
+
+## 참고자료
+
+https://studiomeal.com/archives/533
