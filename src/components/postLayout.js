@@ -72,7 +72,7 @@ export default function DetailPage({ data }) {
           marginTop: "50px",
           fontSize: "1.2rem",
           lineHeight: "2rem",
-          wordBreak: "break-all",
+          wordBreak: "keep-all",
         }}
       >
         <MDXProvider
