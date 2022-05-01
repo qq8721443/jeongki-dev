@@ -22,6 +22,7 @@ const CodeBlock = ({ children, className }) => {
             borderRadius: "10px",
             margin: "10px 0px",
             overflowX: "auto",
+            fontFamily: "Source Code Pro",
           }}
         >
           {tokens.map((line, i) =>
