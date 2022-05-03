@@ -1,0 +1,214 @@
+---
+title: "[데브코스] 32일차 TIL (SCSS)"
+description: SCSS를 소중히 여기자! (1)
+tag: [데브코스, 공부, TIL, CSS, SCSS, Sass]
+date: 2022-05-03
+---
+
+## 들어가며
+오늘은 CSS의 전처리기인 SCSS(Sass) 를 공부했다. 예전부터 이름은 많이 들어봤는데 공부할 엄두를 못 내던 친구들이라 이번 기회에 공부할 수 있어서 좋았다. 
+
+## SCSS (Sass)
+_SCSS_ 와 _Sass_ 는  표준 CSS 의 단점을 해결하기 위해 등장한 CSS 전처리기이다. 기본 CSS 만으로는 복잡한 스타일을 다루기 어렵기 때문에, 이를 프로그래밍적으로 작성하고 해결하기 위해 만들어졌다. 웹 브라우저에서는 전처리 도구를 사용할 수 없기 때문에 작성은 SCSS 또는 Sass 로 하고 최종적으로 CSS 로 변환해 사용한다. CSS 전처리기를 검색하면 Sass(SCSS) 라는 표현을 사용하는 글을 많이 볼 수 있을 것이다. _Sass_ 와 _SCSS_ 는 어떤 차이가 있을까? 가장 큰 차이점으로 _Sass_ 는 중첩을 위해 들여쓰기를 사용하고 _SCSS_ 는 중괄호를 사용한다. 또,  _SCSS_ 는 세미콜론을 붙이고, _Sass_ 는 붙이지 않는다. _Sass_ 가 먼저 나오고 _SCSS_ 가 표준 CSS와의 호환을 위해 _Sass_ 의 문법을 매핑해서 나온 것이기 때문에 CSS와의 호환을 위해서는 _SCSS_ 를 사용하는 것이 좋다.
+
+## 주석
+_SCSS_ 에서는 두 가지 방법의 주석을 사용할 수 있다. _//_ 와 _/* */_ 인데 첫 번째는 주석 처리한 코드가 컴파일 결과로 출력되지 않고, 두 번째는 컴파일 결과에 주석 처리 된 코드가 주석 처리된 채로 출력된다.
+
+## 중첩
+기존 CSS의 경우 중첩 기능을 제공하지 않기 때문에 선택자를 작성할 때 반복되는 선택자가 많았다. _SCSS_ 는 선택자 안에 선택자를 작성해서 선택자의 반복을 줄일 수 있다.
+```css
+/* CSS */
+.container .item {
+	width: 100px;
+	height: 100px;
+}
+.container .box {
+	width: 50px;
+	height: 50px;
+}
+```
+```scss
+/* SCSS */
+.container {
+	.item {
+		width: 100px;
+		height: 100px;
+	}
+	.box {
+		width: 50px;
+		height: 50px;
+	}
+}
+```
+
+중첩해서 선택자를 작성할 때 _&_ 기호를 사용하면 상위 선택자를 참조할 수 있다.
+```css
+/* CSS */
+.container {
+	background-color: red;
+}
+.container:hover {
+	background-color: blue;
+}
+```
+```scss
+/* SCSS */
+.container {
+	background-color: red;
+	&:hover {
+		background-color: blue;
+	}
+}
+```
+CSS 속성을 작성할 때에도 반복되는 키워드가 있다면 중복을 제거할 수 있다.
+```css
+/* CSS */
+.container {
+	margin-top: 10px;
+	margin-right: 20px;
+	margin-bottom: 30px;
+	margin-left: 40px;
+}
+```
+```scss
+/* SCSS */
+.container {
+	margin: {
+		top: 10px;
+		right: 20px;
+		bottom: 30px;
+		left: 40px;
+	}
+}
+```
+특정한 범위 안에 선택자를 정의해야 하는데 상위 선택자를 없애고 싶을 때 사용한다. 선택자 앞에 _@at-root_ 를 붙여주면 상위 선택자가 사라진다.
+
+## 변수
+자바스크립트에서 _var_ 와 _let_ 을 사용해 재할당 가능한 변수를 선언할 수 있는데 SCSS에서는 _$_ 를 사용해 변수를 선언할 수 있다.
+```scss
+$name: value;
+```
+변수의 유효범위는 변수가 선언된 영역의 블럭 범위이다. 특정 블럭 내에 변수가 선언되었을 때 이 변수를 전역 변수로 만들 수 있는데 변수의 값 뒤에 _!global_ 플래그를 사용하면 된다. 만약 미리 선언된 변수가 있을 때 그 변수의 값을 사용하고 싶다면 변수 값 뒤에 _!default_ 플래그를 사용하면 된다.
+
+## 보간
+자바스크립트에서는 _\`${}\`_ 를 사용해 문자열 보간을 할 수 있다. _SCSS_ 에서는 _#{}_ 을 사용해 문자열 보간을 한다. 속성값으로 사용할 수도 있고 선택자에도 사용 가능하다.
+
+## 데이터
+SCSS 에는 여러가지 데이터 종류가 있다. 
+- Numbers: 숫자이다. 단위가 붙어 있는 숫자(10px 등)도 숫자 데이터로 분류한다.
+- Strings: 문자로 되어 있는 값이다.
+- Colors: 모든 색상 데이터이다.
+- Booleans: 참, 거짓이다.
+- Null: null 값인 속성은 컴파일 되지 않는다.
+- Lists: 소괄호를 사용해 만든 배열이다. 양 끝의 소괄호를 제거하거나 요소 사이 쉼표를 떼도 된다.
+- Maps: 소괄호를 사용해 Map을 만든다. _key: value_ 형식이다.
+
+## 연산자
+
+### 산술 연산자
+덧셈, 뺄셈, 곱셈, 나눗셈, 나머지 연산을 수행할 수 있다. +, -, *, /, % 를 사용해 간단하게 계산을 수행할 수 있다. 
+> 주의해야 할 점
+> CSS에서 단축 속성을 사용할 때 속성값을 구분하기 위해 슬래시를 사용하는데, 이게 SCSS에서 나눗셈 연산자와 겹쳐서 그냥 나눗셈을 하면 제대로 동작하지 않게 된다. 나눗셈을 위해서는 
+> - 나눗셈 연산 부분을 소괄호로 묶음
+> - 변수와 함께 나누기 연산자를 사용
+> - 나누기 연산자와 다른 연산자를 함께 사용
+> 
+> 과 같은 방법을 사용해야 한다.
+> 또, 연산하는 단위가 다르면 에러가 발생하는데, 이때는 CSS의 calc() 함수를 사용한다.
+
+### 비교 연산자
+피연산자 두 개를 비교할 때 사용한다. 자바스크립트에서 사용하는 것과 같고 ==, !=, <, >, <=, >= 가 있다.
+
+### 논리 연산자
+_and_, _or_, _not_ 연산자를 사용할 수 있다.
+
+## @mixin
+_@mixin_ 은 스타일의 재활용을 위해 사용한다.
+```css
+@mixin large-text {
+	font-size: 30px;
+	font-weight: bold;
+	font-family: sans-serif;
+	color: blue;
+}
+```
+위와 같이 믹스인의 이름을 정의하고 스타일을 정의한다. 정의해놓은 믹스인을 사용하기 위해서는 믹스인이 필요한 곳에 _@include_ 를 사용한다.
+```css
+.box {
+	width: 100px;
+	height: 100px;
+	@include large-text;
+}
+```
+_@include_ 와 믹스인의 이름을 통해 정의된 스타일을 불러올 수 있다.
+
+믹스인은 함수처럼 인자를 받아서 사용할 수도 있다.
+```scss
+@mixin large-text($value: defaultValue) {
+}
+```
+이 때 매개변수의 기본값을 정의할 수 있는데 매개변수 옆에 콜론을 사용해 기본값을 지정하면 된다.
+
+### 가변 인수
+
+가변인수를 사용할 수 있다. 변수 이름 뒤에 _..._ 을 사용한다. 자바스크립트의 전개 연산자와 비슷하다.
+```css
+@mixin bg($w, $h, $b...) {
+	width: $w;
+	height: $h;
+	background: $b;
+}
+```
+이걸 사용해서 전개 연산자를 리스트 데이터를 전개해서 순서대로 매개변수로 넣을수도 있음.
+```scss
+@mixin test($a, $b, $c, $d){
+	margin: {
+		top: $a; // 10px
+		right: $b; // 20px
+		bottom: $c; // 30px
+		left: $d; // 40px
+	}
+}
+.container {
+	$value: 10px 20px 30px 40px;
+	@include test($value...)
+}
+```
+위와 같이 리스트 데이터를 전개해서 매개변수에 각각의 값을 전달할 수 있다.
+
+### 키워드 인수
+믹스인에 매개변수를 받도록 정의했는데 특정 매개변수만 전달하고 싶을 수 있다. 이 때는 _($변수이름: 값)_ 의 형태로 원하는 인자만 전달할 수 있다.
+```scss
+@mixin test($width, $style:solid, $color:black) {
+	border: $width $style $color;
+}
+.container {
+	@include test($width: 2px);
+}
+```
+위의 _.container_ 에서와 같이 원하는 매개변수의 값만 넘겨줄 수 있다. 이때, 다른 매개변수의 값을 넘기지 않으면 오류가 발생하기 때문에 믹스인을 정의할 때 매개변수의 기본값을 설정해줘야 한다.
+
+### 컨텐트 규칙
+```scss
+@mixin test($width){
+	width: $width;
+	height: 100px;
+	@content;
+}
+.container {
+	@include test(100px) {
+		position: absolute;
+	}
+}
+```
+위와 같이 작성하면 _@mixin_ 내부의 _@content_ 부분에 _@include_ 에서 중괄호를 사용해 추가로 정의한 스타일이 적용된다. 최종적으로 _.container_ 에 적용되는 스타일은 아래와 같다.
+```css
+.container {
+	width: 100px;
+	height: 100px;
+	position: absolute;
+}
+```
+
+## 정리
+이번주 정말 바쁜 것 같다. 원래 TIL을 꼼꼼하게 작성하는 편인데 강의도 듣고 세션도 듣고 과제도 생각하다보니 시간이 정말 부족한 것 같다. 과제가 금요일까지 제출인데 아직 시작도 못했다. CSS라서 약간 만만하게 생각했던 것 같은데, CSS는 항상 잘 대해줘야 한다는 걸 오늘도 깨닫는다. CSS를 소중히 여기자...
