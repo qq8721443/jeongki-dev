@@ -1,0 +1,250 @@
+---
+title: "[데브코스] 37일차 TIL (Vue, Parcel, Webpack)"
+description: 싱글 파일 컴포넌트 사용하기
+tag: [데브코스, 공부, TIL, javascript, Vue.js, Parcel, Webpack]
+date: 2022-05-10
+---
+
+## 들어가며
+오늘은 컴포넌트 기초와 Nodejs, 번들러에 대해 공부했다. 예전에 웹팩 공부하고 싶어서 웹팩 문서 읽고 따라해보고 CRA로 프로젝트 생성해서 내부에 어떻게 웹팩 설정이 돼있는지 확인해 본 적이 있다. 근데 CRA는 너무 복잡해서 하루 정도 쳐다보다가 포기했는데 기초부터 차근차근 강의를 들으니까 이해가 쏙쏙 되는 느낌이다. 
+
+## Vue 컴포넌트
+기존에 Vue 를 사용했던 방식은 createApp을 사용해 Vue 애플리케이션을 정의하고 mount 메서드를 사용해 HTML 요소와 연결하는 것이었다. 컴포넌트를 사용하게 되면 HTML 요소에 연결하는 것이 아닌 HTML 구조를 설정해 HTML 내에서 HTML 태그처럼 사용할 수 있게 된다. 만들어 둔 컴포넌트는 재사용이 가능하다.  
+컴포넌트를 사용하기 위해서는 등록이라는 과정을 통해 사용할 수 있는데, 등록에는 **전역 등록**, **지역 등록** 두 가지가 있다.
+- 전역 등록: app의 component 메서드를 사용해 등록한다. 이 방법으로 등록한 컴포넌트는 Vue 내부 어디에서나 사용할 수 있다.
+	```javascript
+	const app = Vue.createApp({})
+
+	app.component('component-name', {
+		data() {
+			return {
+				count: 0
+			}
+		},
+		template: `
+			<button>
+				Button
+			</button>
+		`
+	}
+	```
+- 지역 등록: 등록을 원하는 컴포넌트 내에서 components 속성 내에 정의할 수 있다. 이 방법으로 등록한 컴포넌트는 해당 컴포넌트 내부에서만 사용할 수 있다.
+	```javascript
+	const Component = {
+		data() {
+			return {
+				...
+			}
+		},
+		template: `
+			...
+		`
+	}
+	
+	const App = {
+		components: {
+			'component-name': Component
+		}
+	}
+	```
+
+보통의 경우 지역 등록을 통해 컴포넌트를 등록한다고 한다.
+
+컴포넌트에 데이터를 전달하기 위해 _props_ 를 사용한다. _props_ 는 컴포넌트에 등록할 수 있는 커스텀 속성인데, 이를 사용해 상위에서 하위 컴포넌트로 데이터를 전달할 수 있다. 
+```javascript
+const app = Vue.createApp({});
+
+app.component('component-name', {
+	props: ['title'],
+	template: `<h4>{{ title }}</h4>`	
+})
+```
+```html
+<component-name title="Hello~"></component-name>
+```
+
+위와 같이 props 속성에 받고자 하는 데이터 이름을 설정하면 컴포넌트의 속성으로 해당 props의 이름을 사용할 수 있다. 전달 받은 데이터는 컴포넌트 내에서 사용할 수 있다.
+> props는 readonly 이기 때문에 값을 변경하려고 하면 오류가 발생한다.
+
+만약 컴포넌트 내부에서 외부로 이벤트를 전달하기 위해서는 어떻게 해야할까? 이때는 _$emit_ 을 사용한다. 
+```html
+<button @click="$emit('custom-event-name')">
+	Button
+</button>
+```
+위와 같이 작성하게 되면 _custom-event-name_ 이라는 이름의 커스텀 이벤트가 상위 컴포넌트로 전달되고 
+```html
+<div @custom-event-name="console.log('이벤트 발생')"></div>
+```
+해당 이벤트를 수신해서 이벤트를 핸들링 할 수 있다.  
+_\$emit_ 메서드의 두 번째 인자로 데이터를 전달할 수 있는데 이 데이터는 _\$event_ 객체를 통해 사용할 수 있다.
+
+## 싱글 파일 컴포넌트
+위에서 살펴 본 방식대로 컴포넌트를 정의하게 되면 프로젝트의 규모가 복잡할수록 여러가지 단점이 생긴다.
+1. 전역에 정의하기 때문에 모든 컴포넌트마다 고유한 이름을 가져야 한다.
+2. 문자열 템플릿을 사용하기 때문에 여러 줄의 HTML을 작성할 때 가독성이 떨어진다.
+3. CSS가 지원되지 않는다.
+4. 빌드 단계가 없기 때문에 전처리기를 사용할 수 없고, HTML과 ES5 자바스크립트를 사용해야한다.
+
+이러한 문제를 해결하기 위해 각 컴포넌트를 파일로 나누는 싱글 파일 컴포넌트 방식을 사용한다. **싱글 파일 컴포넌트**는 _.vue_ 라는 확장자를 사용하는데, 이 파일 확장자는 브라우저에서 해석할 수 없기 때문에 자바스크립트 파일로 변환하는 과정이 필요하다. 이 과정에서 **Parcel**, **Webpack** 같은 번들러를 사용하게 되는데, 번들러는 NodeJS 환경에서 동작하기 때문에 NodeJS 에 대해 간단히 알 필요가 있다.
+
+### NodeJS
+**NodeJS**는 크롬의 V8 자바스크립트 엔진으로 빌드 된 자바스크립트 런타임이라고 한다. 런타임이란 동작할 수 있는 환경을 의미한다. NodeJS 를 설치하면 npm이라는 노드 패키지 매니저가 설치되는데 이를 통해 다양한 패키지를 설치해 사용할 수 있다.
+
+npm init 명령어를 사용해 현재 폴더를 npm으로 관리하겠다고 선언할 수 있다. 명령어를 실행하면 package.json 이라는 파일이 생성되는데, 해당 파일에서 스크립트를 설정하거나, 설치된 패키지들을 확인할 수 있다. package-lock.json 이라는 파일도 생성되는데 이 파일을 통해 설치 환경과 동일한 환경을 다른 컴퓨터에서 설정할 수 있다. 또, 패키지를 설치하면 node_modules 라는 폴더가 생성되는데 해당 폴더에는 설치된 패키지들이 저장되어 있다. 
+
+## Parcel
+**Parcel**은 간단하고 빠르게 사용할 수 있는 번들러이다. NodeJS 14 버전 이상에서 사용할 수 있다고 한다.  
+```
+npm i -D parcel
+```  
+
+위의 명령어를 통해 parcel을 설치할 수 있다.    
+이제 어떻게 번들링 할 수 있는지 아래를 통해 알아보자.
+```html
+<!-- src/index.html -->
+<!DOCTYPE  html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initialscale=1.0">
+		<title>Document</title>
+		<script type="module" src="./main.js"></script>
+	</head>
+	<body>
+		<div id="app"></div>
+	</body>
+</html>
+```
+```html
+<!-- src/App.vue -->
+<template>
+	<h1>{{ msg }}</h1>
+</template>
+<script>
+export default {
+	data() {
+		return {
+			msg: 'Hello'
+		}
+	}
+}
+</script>
+<style>
+h1 {
+	color: red;
+}
+</style>
+```
+```javascript
+// main.js
+import * as Vue from 'vue';
+import App from './App.vue';
+
+Vue.createApp(App).mount('#app');
+```
+위와 같이 _src_ 폴더 내에 _index.html_, _main.js_, _App.vue_ 파일이 있다고 하자. _index.html_ 파일에서는 script 태그를 사용해 _main.js_ 파일을 모듈로 불러오고, _main.js_ 파일은 import 구문을 사용해 _App.vue_ 파일을 가져오고 있다. 이 때 parcel 을 사용해 연결된 파일을 번들링 할 수 있다. _parcel [진입점]_ 명령어를 사용한다. 번들링 결과물은 dist 폴더에 생성된다. _parcel build [진입점]_ 명령어로 실제 서비스를 위한 번들링을 진행한다. 이 경우 난독화가 적용된다.
+이게 끝이다. 생각보다 엄청 간단하다. 대신, 간단한 만큼 세밀한 설정이 불가능하다. 세밀한 설정이 필요한 경우 Webpack을 사용할 수 있다.
+
+## Webpack
+웹팩은 Parcel과 다르게 번들링 옵션을 설정해줘야 한다. 번들링 옵션은 _webpack.config.js_ 라는 파일에 선언할 수 있다. 웹팩은 NodeJS 환경에서 동작하기 때문에 NodeJS 에서 사용하는 commonjs 모듈 방식을 사용한다. 이 방식은 require와 module.exports 구문을 통해 가져오기와 내보내기를 사용한다.
+```javascript
+const path = require('path');
+
+module.exports = {
+	entry: './src/main.js',
+	output: {
+		path: path.resolve(__dirname, 'dist'),
+		filename: 'filename.js'
+	}
+}
+```
+매우 기본적인 설정 파일의 형태이다. entry 속성을 통해 어떤 파일로 들어가서 파일을 읽을 지 설정한다. output 속성은 번들링이 완료된 파일을 어떤 경로(path)에 어떤 이름(filename)으로 저장할 지 설정한다. 이때 entry 속성에서는 문자열로 된 파일 경로를 사용했지만, path 에서는 NodeJS 내장 모듈인 path의 resolve 메서드와 \_\_dirname 이라는 NodeJS의 전역 변수를 사용해 경로를 설정했다. entry를 제외한 다른 경우에 문자열로 경로를 설정하면 오류가 생길 수 있기 때문에 꼭 path.resolve 와 \_\_dirname 을 사용하는 게 좋다고 한다.
+
+웹팩을 사용하기 위해 webpack을 설치하고, cli 환경에서 사용하기 위해 webpack-cli 도 설치해야 한다.
+```
+npm i -D webpack webpack-cli
+```
+
+parcel의 경우 이 정도 설정만으로 번들링이 진행됐겠지만 웹팩의 경우 손수 설정을 해주어야 한다. 웹팩은 기본적으로 **자바스크립트 번들러**이기 때문에 js 파일만 번들링 할 수 있다. 그렇기 때문에 vue 파일을 해석할 수 없는데, 해석할 수 없는 다른 확장자의 파일을 번들링 할 수 있게 해주는 것을 **loader** 라고 한다.  
+loader 는 webpack.config.js 파일에 module 속성 내에 rules 속성에 배열을 만들고 해당 배열에 객체로 어떤 파일 확장자를 찾을 지 test 속성에 정규표현식을 사용해 정의하고, use 속성을 사용해서 해당 확장자에 어떤 loader를 적용할 지 알려준다.
+```javascript
+module.exports = {
+	...
+	module: {
+		rules: [
+			{
+				test: /\.vue$/,
+				use: ['vue-loader']
+			}
+		]
+	}
+}
+```
+위의 경우 파일 확장자가 _.vue_ 일 때 vue-loader 를 사용하겠다고 설정한 것이다. 이렇게 사용하기 위해서는 vue-loader 라는 패키지를 추가로 설치해야 한다. 
+```
+npm i -D vue-loader
+```
+설치를 완료하고 번들링을 진행하려고 하면 오류가 발생한다. vue-loader를 사용하기 위해 VueLoaderPlugin을 plugins 옵션에 추가해야 한다. 
+```javascript
+const { VueLoaderPlugin } = require('vue-loader');
+module.exports = {
+	...
+	module: {
+		rules: [
+			{
+				test: /\.vue$/,
+				use: ['vue-loader']
+			}
+		]
+	},
+	plugins: [
+		new VueLoaderPlugin()
+	]
+}
+```
+> 내 경우는 이렇게 설정하면 오류 없이 번들링이 진행됐다. 그런데 컴포넌트를 HTML에 사용하려고 하니 코드 반영이 안됐다. 이때는 _@vue/compiler-sfc_ 라는 패키지를 추가로 설치해야 한다.
+
+> 웹팩을 사용할 때 mode 옵션을 명시해줘야 한다고 한다. development와 production 모드를 설정할 수 있는데 설정 파일에 이를 명시해두면 다른 모드는 사용할 수 없기 때문에 package.json에 스크립트로 webpack --mode development 와 같이 설정한다고 한다. 
+
+지금까지의 설정으로 번들링을 진행하면 자바스크립트 파일은 dist 폴더에 생성되지만 HTML 파일의 경우 생성되지 않는다. 이를 위해 **html-webpack-plugin**을 사용한다. template 속성을 통해 번들링 과정에 포함할 HTML 파일의 경로를 입력한다. 이 경우에도 path.resolve를 사용해 경로를 지정해야 특별하게 이 경우는 문자열로 지정해도 된다고 한다.
+```javascript
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+	...
+	plugins: [
+		new HtmlWebpackPlugin({
+			template: './src/index.html'
+		})
+	]
+}
+```
+
+로컬에서 개발용 서버를 사용하기 위해 **webpack-dev-server** 를 사용한다. 코드 변경 시 변경 사항을 자동으로 반영해주는 Hot Module Replacement 를 사용할 수 있다.
+
+CSS 를 처리하기 위해 vue-style-loader 와 css-loader 를 사용한다. 마찬가지로 SCSS 를 사용하기 위해서는 sass-loader가 필요하다. loader의 경우 오른쪽에서 왼쪽, 아래에서 위로 해석되기 때문에 먼저 처리할 대상의 loader 를 나중에 써야 한다.
+
+resolve 속성의 extensions를 통해 확장자를 생략할 수 있고, alias를 사용해 경로 별칭을 설정할 수 있다.
+```javascript
+const path = require('path');
+
+module.exports = {
+	...
+	resolve: {
+		extensions: ['.vue', '.js'],
+		alias: {
+			'~': path.resolve(__dirname, 'src')
+		}
+	}
+}
+```
+위와 같이 설정하면 _.vue_, _.js_ 파일은 import 구문을 사용하거나 할 때 파일 확장자를 생략할 수 있고, src 까지의 경로는 _~_ 를 사용해 나타낼 수 있다.
+
+## 정리
+프론트엔드 공부 시작한 지 얼마 안됐을 때, 웹팩이라는 도구로 뭔가 뚝딱뚝딱 할 수 있다는 게 엄청 멋있어보였다. 나중에 웹팩 배울 때 내가 얼마나 멋있을까 기대했었는데 생각보다 멋있지 않은 것 같다. 그리고 지금까지 혼자 웹팩을 공부한 것보다 오늘 하루 강의를 들으면서 배운 게 훨씬 많은 것 같다...ㅋㅋㅋㅋㅋㅋ 동시에 오늘 뷰 컴포넌트 기초도 공부하고 번들러로 간단하게 뷰 프로젝트 구성하면서 뷰랑 훨씬 친해진 것 같아 기분이 좋다. 이제 곧 과제 시작인데 이번 과제는 차근차근 계획을 세워서 깔끔하게 진행해보고 싶다.
+
+## 참고자료
+Vue 공식문서 https://v3.ko.vuejs.org/   
+Webpack 공식문서 https://webpack.js.org/
