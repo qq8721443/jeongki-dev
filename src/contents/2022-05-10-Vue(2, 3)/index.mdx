@@ -1,0 +1,213 @@
+---
+title: "[데브코스] 35, 36일차 TIL (Vue)"
+description: Vue(2, 3) 쉬운 것 같기도 하고, 어려운 것 같기도 하고...
+tag: [데브코스, 공부, TIL, javascript, Vue.js]
+date: 2022-05-10
+---
+## 들어가며
+35일차, 36일차 강의를 들었다. 팀원들과 공식 문서 읽기 스터디 했을 때에는 이해가 안됐던 내용들이 강의를 들으니까 갑자기 이해가 쏙쏙되는 신기한 경험을 했다. 
+
+## computed
+Vue에서는 이중 중괄호 구문을 사용해 자바스크립트 표현식을 사용하거나, method를 사용해서 데이터를 계산한 값을 표현할 수 있다. _count_ 라는 반응형 데이터가 있고, 이 데이터에 2를 곱한 값을 출력하는 방법을 살펴보자.
+```html
+<div>{{ count * 2 }}</div> <!-- count를 사용한 계산 -->
+<div>{{ double() }}</div>  <!-- method를 사용한 계산 -->
+```
+```javascript
+const App = {
+	data() {
+		return {
+			count: 3
+		}
+	},
+	methods: {
+		double() {
+			return this.count * 2;
+		}
+	}
+}
+```
+위의 방법 대신 **computed** 라는 계산된 데이터를 사용할 수도 있다.
+```javascript
+const App = {
+	data() {
+		return {
+			count: 3
+		}
+	},
+	computed: {
+		double() {
+			return count * 2;
+		}
+	}
+}
+```
+위와 같이 computed 에 double 이라는 함수를 정의하고 이를 데이터로 사용할 수 있다. 이중 중괄호 구문 내에서 계산을 수행하거나, method를 사용하거나 computed를 사용하거나 결과는 같다. 그러나 같은 계산을 반복해서 수행할 때 computed 의 경우 계산 결과를 캐싱하기 때문에 성능면에서 나머지 방법보다 더 낫다. 또 computed 데이터는 의존하고 있는 데이터가 변경되지 않으면 계산을 수행하지 않는다.
+
+## watch
+감시하고자 하는 반응형 데이터의 이름을 함수로 만들어 데이터의 변경을 감시할 수 있다. 
+```javascript
+const App = {
+	data() {
+		return {
+			name: 'jeongki';
+		}
+	},
+	watch: {
+		name() {
+			console.log('changed');
+		}
+	}
+}
+```
+반응형 데이터의 이름이 name 이면 watch 내에 name() 함수를 정의하고 데이터가 변경되었을 때 실행할 코드를 작성할 수 있다. 위의 코드는 name 값이 변경되면 콘솔에 changed 라는 문자열을 출력한다. 
+
+watch를 사용할 때 원시 데이터는 이상 없이 동작하지만, 객체 내부의 속성이나 배열 내부의 요소를 바꾸면 객체나 배열을 감시할 때 변경 사항을 감지하지 못한다. 
+```javascript
+const App = {
+	data() {
+		return {
+			user: {
+				name: 'jeongki',
+				age: 26,
+				gender: 'male'
+			}
+		}
+	},
+	watch: {
+		user() {
+			console.log('changed');
+		}
+	}
+}
+```
+위의 코드에서는 user 객체를 감시하고 있는데 만약 객체 내의 name 속성 값이 변경되면 user() 함수 내부의 코드는 실행되지 않는다. 이를 해결하기 위해 _deep_ 옵션을 사용한다.  
+```javascript
+const App = {
+	data() {
+		return {
+			user: {
+				name: 'jeongki',
+				age: 26,
+				gender: 'male'
+			}
+		}
+	},
+	watch: {
+		user: {
+			handler(newValue, oldValue) {
+				console.log(newValue, oldValue);
+			},
+			deep: true
+		}
+	}
+}
+```
+watch 내에서 기존의 user() 함수 대신 객체 리터럴로 만들고 내부에 handler 라는 함수를 정의한다. 기존에 user() 함수 내에 실행하려는 코드가 handler 함수 내부에서 실행된다. handler 함수는 꼭 이름을 handler로 설정해야 하고 매개변수로 변경되는 값과 기존 값을 받을 수 있다. 다음으로 _deep_ 옵션을 _true_ 로 설정하면 참조형 데이터의 변경 사항도 제대로 감시할 수 있다.
+
+## 클래스와 스타일 바인딩
+Vue의 디렉티브인 _v-bind_ 를 사용해 클래스와 스타일 속성에 데이터를 바인딩 할 수 있다.
+```html
+<div v-bind:class="{ active: isActive }"></div>
+```
+class 속성에 객체를 전달할 수 있다. 이 때 active 라는 키가 클래스의 이름이 되고, isActive 라는 값이 참일 때만 active 클래스가 추가된다. 같은 방법으로 배열을 전달할 수도 있다.  
+
+클래스와 마찬가지로 스타일도 바인딩 할 수 있다.
+```html
+<div v-bind:style="{ color: activeColor }"></div>
+```
+```javascript
+data() {
+	return {
+		activeColor: 'red'
+	}
+}
+```
+위와 같이 작성하면 글자색이 red로 설정된다.
+
+## 조건부 렌더링
+
+v-if, v-else-if, v-else 를 형제 요소로 연결해 사용할 수 있다. 만약 해당 요소 사이에 다른 요소가 들어가게 되면 제대로 동작하지 않게 된다.
+```html
+<div v-if="condition1">condition1이 참일 때 렌더링</div>
+<div v-else-if="condition2">condition2가 참일 때 렌더링</div>
+<div v-else>condition1, 2 모두 거짓일 때 렌더링</div>
+```
+v-if 와 비슷하게 v-show 를 사용할 수도 있다.
+```html
+<div v-show="condition">v-show test</div>
+```
+v-show를 사용하면 _display: none_ 을 사용해 요소를 화면에 그리거나 그리지 않게 된다. 이와 다르게 v-if 는 요소가 아예 HTML에서 사라진다. v-show의 경우 무조건 HTML 구조에 포함되기 때문에 초기 렌더링 비용이 올라가지만 자주 토글되는 경우 _display: none_ 속성만으로 제어하기 때문에 전환 비용이 낮아진다. v-if 는 해당 요소를 구조적으로 생성하지 않기 때문에 초기 렌더링 비용이 낮아지지만, 자주 토글되는 경우 계속해서 HTML 구조에 추가하거나 삭제해야하기 때문에 전환 비용이 높다.
+
+> v-if 와 v-for 를 같이 사용하면 안된다.
+> v-if의 우선순위가 v-for 보다 높아서 v-for 범위의 변수에 접근할 수 없기 때문이다. 만약 두 개를 같이 써야하는 상황이라면 **template** 태그를 사용해 해결할 수 있다.
+
+## 리스트 렌더링
+v-for 디렉티브를 사용해 HTML 요소에 배열 데이터를 매핑할 수 있다.
+```html
+<ul>
+	<li v-for="item of items">{{ item }}</li>
+<ul>
+```
+v-for 를 사용할 때는 key 속성을 전달해야 한다. 데이터를 변경했을 때 HTML 구조 전체를 변경하는 것이 아니라 내부적으로 최적화 과정을 통해 변화가 있는 부분만 변경하게 되는데, 이 때 고유한 key 값을 사용해서 최적화를 진행하기 때문에 필수적으로 지정해야 한다.
+
+## 이벤트 핸들링
+v-on 디렉티브를 사용해 이벤트를 핸들링 할 수 있다.
+```html
+<button v-on:click="counter += 1">Button</button>
+```
+```javascript
+const App = {
+	data() {
+		return {
+			counter: 0
+		}
+	}
+}
+```
+_v-on:_ 다음에는 리스닝 할 이벤트를 사용하면 된다. 그런데 위와 같이 사용하면 이벤트 핸들러 함수가 복잡해지면 사용하기 어렵다. 그렇기 때문에 methods 로 핸들러 함수를 정의해서 사용하는 것이 좋다.
+```html
+<button v-on:click="count">Button</button>
+```
+```javascript
+const App = {
+	data() {
+		return {
+			counter: 0
+		}
+	},
+	methods: {
+		count() {
+			this.counter += 1;
+		}
+	}
+}
+```
+이렇게 메서드를 정의하고 v-on에 메서드의 이름을 전달해서 사용할 수 있다.
+
+### 이벤트 수식어
+이벤트 핸들러 내부에서 _event.preventDefault()_ 를 사용해 기본 동작을 막거나 _event.stopPropagation()_ 을 사용해 이벤트 전파를 막는 등의 작업을 하는 경우가 많은데, 이를 간단한 구문으로 처리할 수 있게 미리 정의된 **이벤트 수식어**가 있다. _v-on_ 의 이벤트 다음에 점으로 된 이벤트 수식어를 체이닝을 통해 붙여준다.
+```html
+<a v-on:click.prevent="onClick">Link</a>
+```
+이렇게 작성하면 a 태그를 클릭했을 때의 기본 동작을 막게 된다. 이벤트 수식어의 종류가 많기 때문에 [공식 문서](https://v3.ko.vuejs.org/guide/events.html#%E1%84%8B%E1%85%B5%E1%84%87%E1%85%A6%E1%86%AB%E1%84%90%E1%85%B3-%E1%84%89%E1%85%AE%E1%84%89%E1%85%B5%E1%86%A8%E1%84%8B%E1%85%A5)를 참고하면 좋을 것 같다.
+
+이벤트 수식어와 마찬가지로 키 수식어, 시스템 수식어가 있다.
+
+## 폼 입력 바인딩
+_v-model_ 디렉티브를 사용해 input, textarea, select 요소들에 양방향 데이터 바인딩을 생성할 수 있다. 양방향 데이터 바인딩이란 입력 요소에 반응형 데이터를 바인딩하고, 입력 요소의 값을 변경하면 반응형 데이터가 변경되는 것을 의미한다.
+```html
+<input v-model="inputData" />
+<p>{{ inputData }}</p>
+```
+input 태그에 _v-model_ 을 사용해 데이터를 연결하고 input 요소의 값을 변경하면 자동으로 p 태그 내부의 값도 변경된다.   
+
+> 주의할 점  
+> 
+> IME(한국어, 중국어, 일본어 등)를 사용하는 언어의 경우 한 글자가 완성되기 전까진 v-model을 사용해 연결된 데이터 값이 변경되지 않는다. 이를 해결하기 위해서는 v-bind를 사용해 데이터를 연결하고, v-on:input을 사용해 input 이벤트가 발생했을 때 직접 데이터를 변경해주어야 한다.
+
+## 정리
+원래 이해가 잘 됐던 내용들은 조금 빼고 정리해봤다. 너무 대충 작성한 감이 없지 않지만, 그래도 나중에 내가 읽고 리마인드 할 정도로 만족해야 할 것 같다. 지금까지는 아예 처음 보는 사람도 이해할 수 있을 정도로 작성하는 게 목표였는데, 이렇게 하려다 보니까 TIL 작성하는데 시간이 오래 걸리고 다음날 공부에 지장이 생겨서 일단은 내가 배운것만 딱 정리한다는 느낌으로 작성하는 게 좋을 것 같다.
+
+## 참고자료
+[Vue 공식문서](https://v3.ko.vuejs.org/)
