@@ -1,0 +1,184 @@
+---
+title: "[데브코스] 39일차 TIL (Vue, Vuex)"
+description: Vue(6)
+tag: [데브코스, 공부, TIL, javascript, Vue.js, Vuex]
+date: 2022-05-12
+---
+
+## 들어가며
+오늘도 Vue 를 공부했다. 새로운 기능을 마구 배우고 있어서 머릿속이 복잡하다. 저번에 웹팩 강의를 듣고 Vue 와 Webpack 을 사용해 기본 프로젝트 구조를 구성했는데 HMR이 제대로 작동하지 않는 걸 발견했다. HTML 파일이나 JS 파일이 변경되면 HMR이 제대로 작동하는데 Vue 파일을 변경하면 변경 사항이 반영이 안됐다. Vue 파일만 제대로 동작을 하지 않아서 vue-loader 쪽이 문제가 있나 싶어서 재설치를 해봤는데 문제가 해결되지 않았다. 패키지를 설치할 때 노드 버전이 14.18 이었나 조금 예전 버전이라서 LTS 버전으로 변경하고 다시 처음부터 프로젝트 구성하니까 문제 없이 제대로 동작한다. 뭐가 문제였을까..?
+
+## 플러그인
+Vue 는 전역에서 접근할 수 있는 기능을 위해 플러그인이라는 방법을 제공한다. 
+```javascript
+export default {
+	install: (app, options) => {
+		// 플러그인 코드 작성
+	}
+}
+```
+
+install 메서드는 app과 options를 매개변수로 사용한다. _app.config.globalProperties_ 로 전역에서 접근 가능한 플로그인을 만들 수 있다.
+```javascript
+export default {
+	install: (app, options) => {
+		app.config.globalProperties.$name = () => {
+			console.log('plugin');
+		}
+	}
+}
+```
+_app.config.globalProperties_ 다음으로 전역에서 접근할 때 사용할 이름을 지정할 수 있다. 예제에서는 _$name_ 이라는 값을 사용했는데 $가 붙는 이유는 전역에서 접근할 수 있는 값이라는 걸 나타내기 위해서이다. $를 사용하지 않아도 된다.  
+이렇게 만든 플러그인은 Vue 애플리케이션에 _use_ 메서드를 사용해 등록할 수 있다. _app.use_ 의 두 번째 인자로 옵션을 추가할 수 있고, 플러그인을 정의할 때 매개변수로 받았던 options 값으로 사용할 수 있다.
+```javascript
+import pluginTest from '...';
+
+app.use(pluginTest, options)
+```
+플러그인을 정의한 파일을 가져오고 해당 변수를 use의 첫 번째 인자로 넘겨주면 된다.   
+
+## 믹스인
+믹스인은 컴포넌트에 재사용 가능한 기능을 추가하기 위해 사용한다. 만약 컴포넌트 A 와 컴포넌트 B 가 있다고 했을 때, 두 개의 컴포넌트에 공통적으로 선언되어 있는 데이터나 메서드 등이 있다면 이를 하나의 믹스인에 정의하고 상속하는 것처럼 사용할 수 있다.
+```javascript
+const myMixin = {
+	create() {
+		this.hello();
+	},
+	methods: {
+		hello() {
+			console.log('hello from mixin!')
+		}
+	}
+}
+```
+위와 같이 믹스인 객체를 정의하고 해당 믹스인을 사용할 컴포넌트에 mixins 옵션에 배열 형태로 정의한 믹스인을 넣을 수 있다.
+```javascript
+const app = Vue.createApp({
+	...
+	mixins: [myMixin]
+})
+```
+
+전역에 믹스인을 등록할 수도 있다. 이 경우 모든 컴포넌트에 믹스인이 적용되는데 _app.mixin_ 을 사용해 등록하면 된다.
+
+### 옵션 병합
+만약 믹스인을 적용하는 기존 컴포넌트에 정의된 데이터나 기능들이 믹스인에 중복으로 적용되어 있다면 기준에 따라 옵션을 병합할 필요가 있다. 
+- 데이터: 중복된 데이터가 있다면 컴포넌트의 데이터가 우선 적용된다.
+- 라이프사이클 훅: 같은 이름의 훅 함수는 내부 코드가 모두 호출될 수 있게 컴포넌트의 훅과 믹스인의 훅 모두 배열에 병합된다.
+- method, components, directives 같은 객체 값을 요구하는 옵션은 같은 객체에 병합된다. 객체 내부의 속성이 중복된다면 역시 컴포넌트의 속성이 우선 적용된다.
+
+## Teleport
+텔레포트를 알아보기 전에 모달을 만드는 경우를 빠르게 살펴보자. 보통 모달은 뷰 포트 전체 영역을 차지하는 배경 부분과 배경 내에 실제 모달창의 내용을 표시하는 영역으로 나뉜다. 뷰 포트 전체를 차지하기 위해 _position: fixed_ 속성을 사용하는데 fixed 의 경우 기본적으로 뷰포트를 기준으로 배치되지만, 조상 요소 중 transform, perspective, filter 속성 중 어느 하나라도 none 이 아니라면 해당 요소를 기준으로 배치된다. 그렇기 때문에 모달 배경의 위치가 의도치 않은 곳으로 옮겨질 위험이 있는데 이때 사용할 수 있는 기능이 **Teleport** 이다. 단어에서 알 수 있는 것처럼 _teleport_ 태그 내에 있는 모든 요소들을 원하는 위치의 요소 내에서 출력 가능하게 한다. 
+```html
+<teleport to="selector">
+	<div>이사가는거야?<div>
+	<div>123</div>
+</teleport>
+```
+_teleport_ 의 to 속성에 selector를 사용해 원하는 DOM 요소로 내부 요소들을 출력할 수 있다.
+
+## Provide, Inject
+컴포넌트에서 하위 컴포넌트로 데이터를 전달하기 위해서는 props 를 사용한다. 만약 자식 요소가 아닌 자손 요소에 데이터를 전달하려면 어떻게 해야할까? props 를 사용해 자식 요소를 거쳐 자손 요소로 전달해야 할 것이다. 만약 이 깊이가 더 깊어진다면 어떨까? 원하는 특정 컴포넌트까지 데이터를 전달하기 위해 수많은 컴포넌트를 거쳐야 할 것이다. 이 과정이 매우 번거롭기 때문에 등장한 기능이 _Provide_ 와 _Inject_ 이다. 데이터를 전달하고자 하는 컴포넌트에서 provide 를 사용해 전달할 데이터를 정의하고, 데이터를 받고자 하는 컴포넌트에서 inject를 사용해 해당 데이터를 받아서 사용할 수 있다. 
+```javascript
+// 상위 컴포넌트
+export default {
+	...
+	provide() {
+		return {
+			msg: 'Hello!'
+		}
+	}
+}
+// 하위 컴포넌트
+export default {
+	...
+	inject: ['msg']
+}
+```
+
+그런데 provide 로 제공한 데이터는 반응성을 가지지 않는다. 이를 해결하기 위해 Vue 의 computed 함수를 사용해 직접 데이터를 반응형으로 만들어줘야 한다.  
+
+지금까지는 조상과 후손 관계에 있는 컴포넌트 사이에서 데이터를 전달하는 방법을 공부했다.만약 조상과 후손 관계가 아니라면 provide와 inject를 사용할 수 없는데 이때 사용할 수 있는 것이 Vuex이다.
+
+## Vuex
+**Vuex** 는 전역에서 접근할 수 있는 데이터를 관리하기 위해 사용한다. npm을 통해 패키지를 설치할 수 있는데 Vue 3버전을 사용할 경우 Vuex는 꼭 4버전을 사용해야 한다.
+```javascript
+npm i vuex@4
+```
+Vuex는 전역에서 접근할 수 있는 저장소를 store 라고 한다. store를 사용하기 위해 Vuex 의 _createStore_ 함수를 사용한다.  
+```javascript
+import { createStore } from 'vuex';
+
+export default createStore({
+	state() {
+		return {
+			msg: 'Hello'
+		}
+	},
+	getters: {
+		reversedMsg(state) {
+			return state.msg.split('').reverse().join('')
+		}
+	},
+	mutations: {
+		changeMsg(state) {
+			state.msg = 'Bye~'
+		}
+	},
+	actions: {
+		...
+	}
+})
+```
+createStore 함수 내에는 객체 리터럴을 정의하고 컴포넌트와 비슷하게 속성들을 정의한다. store는 크게 4가지의 속성을 가지고 있는데
+- state: 상태를 관리한다. 전역에서 관리하는 데이터를 상태라고 한다.
+- getters: Vue 컴포넌트의 computed와 비슷하게 계산된 상태값을 반환하는 역할을 한다. 매개변수로 state 값을 받아 상태값을 참조할 수 있다.
+- mutations: 상태 값을 변경시키는 메서드를 정의한다. 마찬가지로 매개변수로 state 값을 받는다.
+- actions: 위에서 정의한 함수 외의 모든 함수를 정의할 때 사용한다. 보통 비동기 작업을 위한 함수를 정의할 때 사용하는 것 같다. actions 내부의 함수는 매개변수로 context 객체를 받는다. 이 객체는 state, getters, commit, dispatch 에 접근할 수 있는데 각각 state, getters, mutations, actions를 의미한다.   
+
+store에는 어떻게 접근할 수 있을까? 
+- state: this.$store.state.상태이름
+- getters: this.$store.getters.메서드이름
+- mutations: this.$store.commit('메서드이름')
+- actions: this.$store.dispatch('메서드이름')
+
+프로젝트가 커지면 store 를 기능에 따라 모듈화해서 사용할 수 있다. 각각의 store를 정의하고 최상위 store에서 modules 속성에 객체 리터럴로 어떤 모듈을 사용할지 정의할 수 있다.
+```javascript
+createStore({
+	...
+	modules: {
+		사용할 모듈 이름: store 객체 이름
+	}
+})
+```
+
+각 모듈의 네임스페이스를 설정할 수도 있는데, 이때는 해당 모듈의 내부에서 namespaced 속성을 true로 설정하면 된다.  
+
+Vuex는 매핑을 지원한다. 
+```javascript
+computed: {
+	storeMsg() {
+		return this.$store.state.msg;
+	},
+	storeMessage()  {
+		return  this.$store.state.message.message
+	}
+}
+```
+기존에는 위와 같이 컴포넌트 내에서 상태값을 사용할 때 store에서 데이터를 하나씩 꺼내서 사용해야 했다면 매핑 함수를 사용하면 아래와 같이 간단하게 처리할 수 있다.
+```javascript
+computed: {
+	...mapState(['msg']),
+	...mapState('message', ['message'])
+}
+```
+
+매핑 함수의 첫 번째 인자로 네임스페이스를 전달하고 두 번째 인자는 해당 네임스페이스 내에서 사용할 상태 이름을 배열 형태로 전달한다. 전역 store 의 경우 네임스페이스는 생략할 수 있다.  
+
+마찬가지로 _mapGetters_, _mapMutations_, _mapActions_ 함수도 사용할 수 있다.
+
+## 정리
+오늘도 많은 걸 공부했다. 원래 오늘부터 과제 기간인데 강의 듣고 코드리뷰 하느라 과제는 시작도 못했다. 과제 진행하면서 배운 내용을 잘 적용할 수 있도록 해야겠다!
+
+## 참고자료
+Vue 공식문서 https://v3.ko.vuejs.org/
