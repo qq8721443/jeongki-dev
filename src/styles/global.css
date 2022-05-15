@@ -30,6 +30,12 @@ select {
   font-size: 16px;
 }
 
+@media all and (max-width: 791px) {
+  html {
+    font-size: 14px;
+  }
+}
+
 :root {
   --bgcolor: rgb(248, 250, 248);
   --font-color: #707070;
