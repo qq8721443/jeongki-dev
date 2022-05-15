@@ -68,3 +68,13 @@ a {
   color: var(--font-color);
   text-decoration: none;
 }
+
+.gatsby-resp-image-image {
+  object-fit: contain !important;
+}
+
+.jeongki-custom-img-container {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
