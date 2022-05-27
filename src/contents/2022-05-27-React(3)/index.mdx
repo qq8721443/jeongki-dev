@@ -1,0 +1,71 @@
+---
+title: "[데브코스] 50일차 TIL (React)"
+description: 컴포넌트 만들기
+tag: [데브코스, 공부, TIL, javascript, React]
+date: 2022-05-27
+---
+
+## 들어가며
+오늘은 그동안 배운 내용을 바탕으로 여러 가지의 컴포넌트를 만들어보았다. 컴포넌트를 만들고 스토리북으로 만든 컴포넌트를 확인하는 과정으로 강의를 진행했다. 컴포넌트를 만드는 과정은 비슷해서 그 과정을 정리하기보다는 강의를 들으면서 몰랐거나 알아두면 좋은 내용을 정리하고자 한다.
+
+## Image 컴포넌트
+이미지를 보여주기 위한 컴포넌트이다. 기존 _img_ 태그에서 조금 더 많은 기능을 수행할 수 있는 컴포넌트이다. 추가한 기능 중에서 **lazy loading** 이 있었는데 나중에 유용하게 사용할 것 같다. lazy loading 을 사용하지 않으면 이미지가 포함된 페이지가 렌더링 될 때, 모든 이미지를 불러와야 한다. 아직 **화면에 나오지 않는 이미지라도 전부 불러오기 때문에** 초반에 많은 성능을 요구할 수 있다. 이를 해결하기 위해 이미지가 뷰포트에 보이지 않으면 이미지를 불러오지 않고, 뷰포트에 보이면 이미지를 요청해 최적화를 진행할 수 있다.  
+강의에서는 이를 구현하기 위해 _Intersection Observer_ 를 사용했다. 예전 강의에서 무한 스크롤을 구현할 때 처음 배운 기술이었는데, [간단하게 정리해 놓은 글](https://jeongki.dev/post/%EB%8D%B0%EB%B8%8C%EC%BD%94%EC%8A%A4-25%EC%9D%BC%EC%B0%A8-til-%EB%AC%B4%ED%95%9C-%EC%8A%A4%ED%81%AC%EB%A1%A4-%EA%B5%AC%ED%98%84)이 있으니 참고하면 좋을 것 같다. 
+
+## Spacer 컴포넌트
+Spacer는 자식 컴포넌트 간의 간격을 조절하는 컴포넌트이다. 만약 100픽셀의 사각형 컴포넌트 3개가 붙어 있는 상황이 있을 때, 사각형 컴포넌트들을 Spacer로 감싸 사각형 컴포넌트간 간격을 설정할 수 있다. 컴포넌트가 하는 기능은 어렵지 않게 이해할 수 있는데, 그 기능을 구현하기 위해 작성한 코드가 처음보는 코드라 당황했다. 
+
+### React.Children
+리액트가 제공하는 최상위 API 중 하나이다. 불투명 자료 구조인 _this.props.children_ 을 다루는 유틸 함수들을 제공한다.  
+> 불투명 자료 구조란?  
+> 인터페이스에서 구체적인 데이터 구조가 정의되지 않은 자료 구조를 의미한다. 사용자에게 데이터의 내부가 어떻게 구성되었는지 드러내지 않는 것을 의미한다. 
+
+React.Children 에 다양한 메서드들이 있는데 Spacer를 만들기 위해 _React.Children.toArray_ 메서드를 사용했다. Spacer 는 자식 컴포넌트의 마진 속성을 변경해서 간격을 설정한다. 그러기 위해서는 자식 컴포넌트에 접근할 수 있어야 하는데, 이 메서드가 그 기능을 지원한다. 
+```javascript
+React.Children.toArray(children);
+```
+메서드에 children 을 전달하면 각 자식 컴포넌트에 key 가 할당된 배열을 반환한다. 공식문서에 따르면 이 메서드는 children를 다시 정렬하거나 일부만 잘라내고 싶을 때 유용하다고 한다.
+
+### React.isValidElement()
+인자로 전달하는 객체가 리액트 엘리먼트인지 확인하는 메서드이다. toArray 메서드를 사용해 반환 받은 children 배열에서 리액트 엘리먼트인 children 만 다시 반환하는 과정을 거친다. 만약 아래와 같이 JSX를 작성했다고 하자.
+```jsx
+<Spacer>
+	<Box />
+	<Box />
+	<Box />
+	aa
+</Spacer>
+```
+이 때 toArray 메서드를 사용해 반환 받은 배열은 총 4개의 아이템이 들어있다. 3개의 Box 컴포넌트와 1개의 'aa' 문자열이다. 뒤에서 리액트 엘리먼트를 복사해 필요한 스타일을 추가하고 복사한 엘리먼트를 반환해주는데, 이 때 리액트 엘리먼트가 아닌 'aa'로 인해 오류가 발생한다. 그렇기 때문에 오류를 방지하기 위해 **isValidElement** 메서드를 사용한다.
+
+### React.cloneElement
+각각의 자식 컴포넌트에 마진을 추가해야 하기 때문에 새로운 엘리먼트를 반환하는 방법을 사용한다. 
+```javascript
+React.cloneElement(element, [config], [...children])
+```
+인자로 전달하는 element를 복사해서 반환한다. 두 번째 인자로 새롭게 추가할 props를 전달할 수 있다. 세 번째 인자로는 자식 요소를 전달한다. 이 때 전달한 자식 요소는 기존의 자식 요소를 대체한다.   
+Spacer 컴포넌트의 경우 기존의 자식 컴포넌트를 복제해 style props를 수정한 값을 적용한다. 
+
+### 결과
+```javascript
+const  nodes = React.Children.toArray(children)
+.filter(element  => React.isValidElement(element))
+.map((element, index, elements) => {
+	return  React.cloneElement(element, {
+		...element.props,
+		style: {
+			...element.props.style,
+			marginRight:  type === 'horizontal' && index !== elements.length -1 ? size : undefined,
+			marginBottom:  type === 'vertical' && index !== elements.length - 1 ? size : undefined,
+		},
+	})
+})
+```
+
+## 정리
+사실 아직 이해가 안되는 부분들이 많다. 직접 컴포넌트를 만들어보면서 공부를 하는 게 좋을 것 같다. 강의 들을 때는 다 이해가 되는 것 같은데 막상 혼자서 해보려고 하면 잘 생각이 나지 않는다. 주말 동안 컴포넌트 여러개 만들어봐야겠다.   
+오늘은 뭔가 정보 전달의 목적보단 일기처럼 쓴 것 같다. 다른 날에 비해서 내용이 부족하긴 하지만 어느 순간부터 TIL 정리하는 게 하루 일과의 마무리처럼 돼버려서 어쩔수가 없다... 
+
+## 참고자료
+프로그래머스 데브코스  
+https://ko.reactjs.org/docs/react-api.html  
