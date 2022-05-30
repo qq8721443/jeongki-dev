@@ -1,0 +1,94 @@
+---
+title: "[데브코스] 51일차 TIL (React)"
+description: 컴포넌트 만들기와 Navigator, Context API
+tag: [데브코스, 공부, TIL, javascript, React]
+date: 2022-05-30
+---
+
+## 들어가며
+Context API에 대해 공부하고 다양한 컴포넌트를 만드는 연습을 했다. 강의를 들으면서 강사님이 짜는 코드를 보며, 가끔씩 소름이 돋을 때가 있다. **이렇게 코드를 짤 수도 있구나** 싶을 때가 있는데, 그런 부분을 놓치지 않고 배웠으면 좋겠다. 
+
+## Navigator
+이모지를 검색할 수 있는 간단한 페이지를 구성해보았다. 이모지 리스트 아이템을 클릭 했을 때, 해당 아이템을 클립보드에 복사하는 기능을 구현하기 위해서 아래의 코드를 사용했다. 
+```javascript
+	navigator.clipboard.writeText(emoji);
+```
+
+**Navigator** 객체는 사용자 에이전트의 상태와 신원 정보를 나타내며, 스크립트로 해당 정보를 질의할 때와 애플리케이션을 특정 활동에 등록할 때 사용한다고 한다. 사용자 에이전트는 **브라우저를 의미**한다. Navigator 객체는 _window.navigator_ 속성으로 접근할 수 있다. Navigator 객체에는 다양한 속성과 메서드가 정의되어 있는데 목록은 [MDN 문서](https://developer.mozilla.org/en-US/docs/Web/API/Navigator)를 참고하면 좋을 것 같다.    
+클립보드를 사용하기 위해서는 navigator 객체의 읽기 전용 속성인 clipboard로 접근해야 한다. 클립보드 속성은 Clipboard 객체를 반환하는데 이 객체를 통해 클립보드의 컨텐츠를 읽거나, 새로운 컨텐츠를 저장할 수 있다.   
+클립보드의 메서드는 다음과 같다.
+- read()
+- readText()
+- write()
+- writeText()
+
+모든 클립보드의 메서드는 비동기적으로 동작한다. 각 메서드들은 _Promise_ 를 반환하는데 해당 프로미스는 클립보드 접근에 성공할 경우 _resolve_ 되고, 접근에 실패할 경우 _reject_ 된다. _read_ 와 _readText_ 는 클립보드에 저장된 컨텐츠를 읽어오고, _write_ 과 _writeText_ 는 클립보드에 데이터를 저장한다. Text가 붙은 메서드와 붙지 않은 메서드의 차이는 텍스트만 저장할 수 있는지, 다른 데이터도 저장할 수 있는지에 있다.
+
+## Context API
+리액트에서는 _prop_ 을 사용해 상위 컴포넌트에서 하위 컴포넌트로 데이터를 전달할 수 있다. 컴포넌트가 몇 개 없다면 props를 전달하는 방법으로 데이터를 전달해도 별 문제는 없다. 그런데 컴포넌트의 깊이가 깊어지면 어떻게 될까?
+![props-drilling](https://qph.fs.quoracdn.net/main-qimg-212a32ca0d74c300fdeb2c6a6e751769)
+
+위의 그림과 같이 컴포넌트가 구성되어 있다고 하자. 만약 1번 컴포넌트에서 6번 컴포넌트로 데이터를 전달하려고 할 때, props 를 사용한다면 1번에서 2번 컴포넌트로, 2번에서 4번, 4번에서 6번 컴포넌트로 1번 컴포넌트의 데이터를 전달해야 할 것이다. 이 **깊이가 더 깊어지면 데이터를 전달하기 더 어려울 것**이다. 이를 **props drilling**이라고 하는데, 이 때 사용할 수 있는 방법이 **Context API**이다.   
+Context API는 데이터를 제공할 _Provider_ 와 데이터를 사용할 _Consumer_ 로 나눠져 있다. Context API를 어떻게 사용하는지 알아보자.
+```javascript
+const Context = React.createContext(defaultValue);
+```
+먼저 _React.createContext()_ 를 사용해 Context 객체를 정의한다. 인자로 기본값을 전달할 수 있다. Context 객체는 Provider 라는 리액트 컴포넌트를 가지고 있다. 
+```javascript
+<Context.Provider value={전달하고 싶은 값}>
+	...
+</Context.Provider>
+```
+이 컴포넌트는 _value_ 라는 prop을 받아서 하위의 컴포넌트에서 조회할 수 있게 전달한다. 하위 컴포넌트에서 데이터를 조회할 때 가장 가까운 Provider 컴포넌트의 value 값을 읽는데, Provider를 찾지 못했을 경우 _createContext_ 에서 넘긴 기본값을 가져온다.   
+Provider로 제공하는 데이터를 사용하기 위해서 _React.useContext_ 훅을 사용한다.
+```javascript
+const value = React.useContext(Context);
+```
+Context 객체를 받아 해당 Context의 현재 값을 반환한다. 현재 값이란 Provider 컴포넌트의 value prop 으로 전달한 값을 의미한다. useContext에 전달하는 인자는 Context 객체 그 자체이다. (React.createContext 로 생성한 Context 객체) 
+
+> useContext를 호출한 컴포넌트는 Context 값이 변경되면 항상 리렌더링 된다. 리렌더링 비용을 줄이기 위해 메모이제이션을 사용하여 최적화할 수 있다. 
+
+강의에서는 useContext를 아래와 같이 사용했다.
+```javascript
+export const useTasks = () => useContext(TaskContext);
+``` 
+간단하지만 나는 생각 못했던 방법이었다. 이렇게 간단한 방법을 왜 생각 못했을까 싶다. 원래는 데이터를 조회할 컴포넌트 각각에 useContext를 사용했는데, 커스텀 훅처럼 하나의 파일에 정의해두고 하위 컴포넌트에서 사용하니까 훨씬 간단한 것 같다. 
+
+## 파일 업로드
+```html
+<input type="file" />
+```
+input의 type을 file로 설정하면 파일을 입력 받을 수 있다. 그런데 이 태그는 스타일을 변경할 수 없다. 기본 스타일이 별로기 때문에 스타일을 적용할 수 있어야 하는데 그럴 수 없기 때문에 특별한 방법을 사용해 스타일을 적용한다.  
+사실 스타일을 적용한다기 보단 input 태그를 숨겨 보이지 않도록 하고, 다른 태그를 통해 스타일을 적용한다. 
+
+```javascript
+const Upload = () => {
+	const inputRef = React.useRef(null);
+
+	const handleClick = () => {
+		inputRef.current.click();
+	}
+
+	const buttonStyle = {
+		width: 100,
+		height: 30,
+		backgroundColor: 'green'
+	}
+
+	return (
+		<input ref={inputRef} type="file" style={{ display: 'none' }} />
+		<button onClick={handleClick} style={buttonStyle}>Click!</button>
+	)
+}
+```
+예시로 버튼을 사용해보았다. input 태그에는 _display: none_ 을 사용해 화면에서 없애고, button의 onclick 이벤트가 발생하면 ref를 사용해 input dom 에 접근해서 input 태그의 클릭 이벤트를 발생시킨다. 
+
+## 정리
+오늘 강의는 실습이 많아서 재미있었다. 강의를 듣고 나서 혼자 똑같이 따라해 보았는데 확실히 혼자서 한번 만들어 보는 게 머릿속에 더 잘 남는 것 같다. 중간중간 새로운 기능을 추가해보기도 하고, 최적화를 고민해보기도 하면서, 내가 이런 생각을 하고 있다는 게 뿌듯했다. 
+
+## 참고자료
+https://developer.mozilla.org/en-US/docs/Web/API/Navigator  
+https://developer.mozilla.org/en-US/docs/Web/API/Navigator/clipboard  
+https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API  
+https://ko.reactjs.org/docs/context.html  
+https://ko.reactjs.org/docs/hooks-reference.html#usecontext  
