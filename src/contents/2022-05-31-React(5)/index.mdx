@@ -1,0 +1,151 @@
+---
+title: "[데브코스] 52일차 TIL (React)"
+description: 컴포넌트 만들기
+tag: [데브코스, 공부, TIL, javascript, React]
+date: 2022-05-31
+---
+
+## 들어가며
+오늘도 역시 다양한 컴포넌트를 만들어보았다. 평소에 만들어 보고 싶었던 컴포넌트도 있었고, Vue 로 영화 검색 페이지를 만들 때 다른 곳에서 가져와서 사용했던 컴포넌트도 있었다. 그런 컴포넌트를 직접 만들어 보면서 조금씩 리액트 컴포넌트를 만드는 방법에 익숙해지고 있다.
+
+## Avatar
+페이스북이나 인스타그램 등에서 사용자 프로필 사진을 보여주기 위해 사용하는 컴포넌트이다. 기존에 이미지를 나타내기 위해 사용했던 _Icon_ 컴포넌트를 _AvatarWrapper_ 라는 styled component 로 감싸서 구현했다. _AvatarWrapper_ 는 _shape_ 이라는 prop을 받아 Avatar의 모양을 _circle_, _round_, _square_ 중 하나로 선택할 수 있게 했다. shape은 _border-radius_ 값을 변경해서 조작할 수 있는데, **50%이면 circle, 0px이면 square, 특정 픽셀 값을 가지고 있으면 round**로 나타낼 수 있다.
+```javascript
+const AvatarWrapper = styled.div`
+	...
+	border-radius: ${({ shape }) => shape === 'circle' ? 
+		'50%' : shape === 'round' ? '4px' : '0px' };
+	...
+`
+<AvatarWrapper shape={shape}>
+```
+중첩 삼항 연산자를 사용해 border-radius 속성을 지정해주었다. 삼항 연산자가 중첩되어 있기 때문에 읽기가 조금 복잡하다. 이를 해결하기 위해 객체를 정의하고 속성과 값을 매핑하는 방법을 사용할 수 있다.
+```javascript
+const ShapeToCssValue = {
+	circle: '50%',
+	round: '4px',
+	square: '0px'
+}
+
+const AvatarWrapper = styled.div`
+	...
+	border-radius: ${({ shape }) => ShapeToCssValue[shape]};
+	...
+`
+```
+위와 같이 _ShapeToCssValue_ 라는 매핑을 위한 객체를 정의하고 shape 값과 해당 shape 일 때의 CSS 값을 매핑해서 간단하게 사용할 수 있다. 간단한 방법인데 결과가 엄청 깔끔해지는 것 같다.
+
+## Slider
+마우스 드래그를 통해 볼륨을 조절할 때 사용하거나 동영상 재생 바 등에 사용되는 컴포넌트이다.   
+![slider](https://flutter.github.io/assets-for-api-docs/assets/material/slider.png)  
+https://flutter.github.io/assets-for-api-docs/assets/material/slider.png  
+보통 위와 같은 형태로 구성되어 있는데 연한 하늘색으로 된 부분을 **레일**, 동그라미 부분을 **핸들**, 왼쪽 시작점부터  핸들까지의 파란색 부분을 **트랙**이라고 한다. 컴포넌트로 구현하기 위해 전체를 감싸는 컨테이너도 필요하다.  
+<br />
+
+```javascript
+const SliderContainer = styled.div`
+	position: relative;
+	width: 100%;
+	height: 16px;
+`
+
+const Rail = styled.div`
+	position: absolute;
+	top: 6px;
+	left: 0;
+	width: 100px;
+	height: 4px;
+	border-radius: 2px;
+	background-color: #aaa;
+`
+
+const Track = styled.div`
+	position: absolute;
+	top: 6px;
+	left: 0;
+	width: 0;
+	height: 4px;
+	border-radius: 2px;
+	background-color: #44b;
+`
+
+const Handle = styled.div`
+	position: absolute;
+	top: 8px;
+	left: 0;
+	width: 12px;
+	height: 12px;
+	transform: translate(-50%, -50%);
+	border-radius: 50%;
+	border: 2px solid #44b;
+	background-color: #fff;
+	cursor: grab;
+`
+```
+컨테이너를 기준으로 absolute로 정렬한다. 값에 따라 Track과 Handle의 위치가 변하게 될텐데, Track의 _width_, Handle의 _left_ 값을 변경해 값에 따른 위치를 변경할 수 있다. 그럼 그 값은 어떻게 변경할 수 있을까?  
+Handle을 클릭하고 좌우로 마우스를 움직일 때 **화면 맨 왼쪽부터 마우스 포인터까지의 X 좌표**에서 **화면 맨 왼쪽부터 컨테이너의 왼쪽 끝 부분까지의 X 좌표**를 빼면 Rail을 기준으로 Handle의 위치와 Track의 너비를 계산할 수 있다.
+```javascript
+const handleOffset = e.pageX - sliderRef.current.offsetLeft;
+const sliderWidth = sliderRef.current.offsetWidth;
+```
+슬라이더 전체 너비에서 트랙의 너비가 차지하는 비율을 사용해 Track과 Handle의 위치를 지정할 수 있다.
+
+## Progress
+작업의 진행 상황을 나타내기 위해 사용하거나, 포트폴리오에서 기술 스택에 대한 숙련도를 나타내기 위해 사용하는 컴포넌트이다. 예전에 Progress 컴포넌트를 만들고 싶었는데, CSS에서 막혀서 만들지 못했었다.  
+Progress 컴포넌트는 Slider 컴포넌트와 비슷한 구조로 만들 수 있다. ProgressContainer, Rail, Track 으로 구성할 수 있다. Track의 너비를 변경해 진행 상황을 나타낼 수 있는데 아래와 같이 줄무늬가 있는 디자인을 추가해 보았다.  
+![striped progress bar](https://www.tutlane.com/images/bootstrap/bootstrap_striped_progress_bars_example_result.PNG)
+https://www.tutlane.com/images/bootstrap/bootstrap_striped_progress_bars_example_result.PNG
+```javascript
+const Track = styled.div`
+	position: absolute;
+	top: 6px;
+	left: 0;
+	width: 0;
+	height: 4px;
+	border-radius: 2px;
+	background-color: #44b;
+	background-size: 20px;
+
+	background-image: linear-gradient(
+		45deg,
+		rgba(255, 255, 255, 0.15) 25%,
+		transparent 25%,
+		transparent 50%,
+		rgba(255, 255, 255, 0.15) 50%,
+		rgba(255, 255, 255, 0.15) 75%,
+		transparent 75%,
+		transparent 100%
+	);
+
+	animation: move 1000ms linear infinite;
+	transition: width 1s ease-in;
+
+	@keyframes move {
+		from {
+			background-position: 0 0;
+		}
+		to {
+			background-position: 40px 0;
+		}
+	}
+`
+```
+_background-image: linear-gradient()_ 를 사용해 반복되는 줄무늬를 디자인 할 수 있다. _@keyframes_ 를 사용해 애니메이션을 정의하고 animation 속성을 통해 정의한 애니메이션을 사용했다. 배경의 위치를 오른쪽으로 옮기는 애니메이션을 반복하는데 이를 통해 배경이 오른쪽으로 계속해서 움직이는 효과를 줄 수 있다.
+
+## Skeleton
+서버에서 데이터를 불러와 화면에 그려주기 전까지는 빈 화면이 나타날텐데, 이 때 데이터를 불러왔을 때 어떤 형태인지 대략적으로 보여주는 컴포넌트를 **Skeleton**이라고 한다. 화면이 어떻게 구성되는지 뼈대를 보여주기 때문에 이런 이름이 붙지 않았을까 생각해본다. Skeleton 컴포넌트를 구현할 때, 지금까지와는 조금 다른 방식으로 구현했다. 원형의 Skeleton, 사각형 모양의 Skeleton 등 다양한 모양의 컴포넌트가 사용되기 때문에 핵심 기능을 가지고 있는 Base 컴포넌트를 만들고, Circle, Box 등의 컴포넌트를 만들 때 Base 컴포넌트의 스타일을 상속 받는 방식을 사용했다. 
+```javascript
+import Base from './Base';
+import styled from '@emotion/styled';
+
+const Circle = styled(Base)`
+	...
+`
+```
+위와 같이 _styled(Base)_ 를 통해 Base 컴포넌트의 스타일을 가져와서 **새로운 스타일과 병합**할 수 있다.
+
+## 정리
+오늘 만들어 본 모든 컴포넌트를 정리하지는 않았다. 지금 당장은 잘 이해 됐다고 생각해서  따로 정리하지 않았는데 분명 나중에 시간이 지나면 까먹을 것 같다. 컴포넌트를 혼자서 많이 만들어봐야 실력이 늘 것 같은데, 연습하기 가장 좋은 곳이 이 블로그라고 생각한다. 처음 블로그를 만들 때, 아무것도 모른 상태로 기능 구현만 하고 싶은 생각에 무작정 개발했었다. 그렇기 때문에 부족한 부분이 엄청 많을텐데,  그런 부분 수정하면서 컴포넌트 기반으로 만드는 연습을 하면 좋을 것 같다.
+
+## 참고자료
+프로그래머스 데브코스  
