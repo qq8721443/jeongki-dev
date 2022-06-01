@@ -1,0 +1,146 @@
+---
+title: "[데브코스] 53일차 TIL (React)"
+description: 컴포넌트와 사용자 정의 훅
+tag: [데브코스, 공부, TIL, javascript, React]
+date: 2022-06-01
+---
+
+## 들어가며
+오늘은 몇 가지 컴포넌트를 만들어 보고, 사용자 정의 훅(커스텀 훅) 을 만드는 방법을 공부해 보았다. 사실 강의를 들으면서 기능 구현에 큰 어려움은 없었던 것 같다. 기술적인 부분보다 **이렇게도 컴포넌트를 만들어서 재사용 할 수 있구나** 라는 생각과 함께, 범용성 높은 컴포넌트를 만드는 사고에 대해서 배우는 것 같다. 사용자 정의 훅도 마찬가지이다. 재사용 가능한 부분을 따로 빼서 훅으로 만든다는 생각이, 기술로 구현하는 것보다 훨씬 어려운 것 같다. 
+
+## Flux
+전역 상태 관리 패턴 아니고, 전공 과목에서 많이 봤던 선속 아니고, Flux라는 컴포넌트가 있다고 한다. 검색해도 관련된 정보가 없어서 해당 컴포넌트에 대한 다른 이름이 있는지는 모르겠지만, CSS Flex를 사용해 레이아웃 구성을 쉽게 할 수 있도록 도와주는 컴포넌트이다. Flux 컴포넌트는 Row와 Col이라는 컴포넌트로 구성된다. Row 가 Col 을 감싸고 있는 구조인데, Row는 Flex Container, Col은 Flex Item 같은 느낌이다. 
+```javascript
+const StyledRow = styled.div`
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	box-sizing: border-box;
+	
+	...
+`
+```
+_display: flex_ 로 설정하고 내부 요소가 넘치면 아래로 줄바꿈 되도록 _flex-wrap: wrap_ 으로 설정했다.
+```javascript
+const StyledCol = styled.div`
+	max-width: 100%;
+	box-sizing: border-box;
+
+	width: ${({ span }) => span && `${(span / 12) * 100}%`};
+	margin-left: ${({ offset }) => span && `${(offset / 12) * 100}%`};
+`
+```
+Col 컴포넌트는 prop으로 span과 offset을 받는다. span은 Col 컴포넌트의 너비를 설정할 수 있고, offset은 왼쪽에서 얼마나 떨어질지 설정할 수 있다. 예제에서는 전체 columns 수를 12로 정의했다. 만들어 둔 컴포넌트를 사용해 그리드 레이아웃을 사용한 디자인을 화면으로 구성할 때 유용하게 사용할 수 있을 것 같다.
+
+## Breadcrumb
+웹에서 사용자가 현재 어디에 위치해 있는지 나타내는 컴포넌트이다. 적절하게 사용하면 사용자의 이탈률을 낮추는 장점이 있다고 하는데 관련해서는 [이 글](https://brunch.co.kr/@ebprux/45)을 참고하면 좋을 것 같다. 스크롤이 너무 길어서 당황했는데, 아래는 다 광고라 간단하게 읽을 수 있다.
+
+## Tab
+![tab-component](https://vuejsexamples.net/wp-content/uploads/2018/04/vue-tab-component.png)
+위와 같이 상단에 선택할 수 있는 버튼이 있고, 클릭한 버튼에 따라 하단의 내용이 변경되는 컴포넌트이다.  크게 Tab 컴포넌트와 Tab.Item 컴포넌트로 구분되어 있다. 완성된 컴포넌트를 어떻게 사용하는지 먼저 확인해보자
+```javascript
+<Tab>
+	<Tab.Item title="Item 1" index="item1">Content 1</Tab.Item>
+	<Tab.Item title="Item 2" index="item2">Content 2</Tab.Item>
+	<Tab.Item title="Item 3" index="item3">Content 3</Tab.Item>
+</Tab>
+```
+
+Tab.Item 컴포넌트는 props로 title과 index를 전달 받는다. title은 상단 탭 버튼에 들어갈 이름,  index는 현재 어떤 컴포넌트가 선택되었는지 확인하기 위해 사용한다. Tab.Item 컴포넌트는 단순하게 title prop을 출력해주면 된다.
+Tab 컴포넌트에서는 children 을 조작해 몇 가지 props와 클릭 이벤트를 추가해준다.
+```javascript
+const  childrenToArray = (children, types) => {
+	return  React.Children.toArray(children).filter(element  => {
+		if (React.isValidElement(element) && types.includes(element.props.__TYPE)) {
+			return  true;
+		}
+	  
+		console.warn(`Only accepts ${Array.isArray(types) ? types.join(', ') : types}
+		as it's children.`)
+		return  false;
+	})
+}
+
+const  items = useMemo(() => {
+	return  childrenToArray(children, 'Tab.Item').map(element  => {
+		return  React.cloneElement(element, {
+			...element.props,
+			key:  element.props.index,
+			active:  element.props.index === currentActive,
+			onClick: () => {
+				setCurrentActive(element.props.index);
+			}
+		})
+	})
+}, [children, currentActive])
+```
+key, active, onClick props를 추가로 설정해준다. Tab 컴포넌트는 현재 선택된 Tab을 확인하기 위해 _currentActive_ 라는 상태를 관리하고 있다. Tab 버튼을 누르면 해당 상태값이 클릭한 엘리먼트의 _element.props.index_ 값으로 변경되고, 그 값과 비교해 현재 선택된 엘리먼트 값을 가져온다.
+```javascript
+const  activeItem = useMemo(() => items.find(element => currentActive === element.props.index)
+```
+
+선택된 엘리먼트는 화면에 출력해야 할 컨텐츠를 children 으로 가지고 있다. children 을 화면에 출력해주면 클릭한 Tab.Item 에 따라 컨텐츠가 바뀌게 된다.
+```javascript
+return (
+	<div>
+		<TabItemContainer>{items}</TabItemContainer>
+		<div>{activeItem.props.children}</div>
+	</div>
+)
+```
+TabItemContainer 는 상단의 버튼을 출력하고, 아래의 div 태그에서는 선택된 탭의 내용을 출력한다.
+
+## 사용자 정의 훅
+사용자 정의 훅으로 useHover, useScroll, useKey, useKeyPress, useClickAway를 만들어 보았다. 이 중에서 useScroll 훅을 만들 때 최적화 방법에 대해 이야기한 게 흥미로워서 정리해보고자 한다. useScroll은 스크롤 이벤트가 발생했을 때 필요한 이벤트를 정의한 훅이다. 구현은 간단하다.
+```javascript
+import { useEffect, useState, useRef } from  "react";
+  
+const  useScroll = () => {
+const [state, setState] = useState({ x:  0, y:  0 });
+const  ref = useRef(null);
+  
+useEffect(() => {
+	const  element = ref.current;
+	if (!element) return;
+	  
+	const  handleScroll = () => {
+		setState({
+			x:  ref.current.scrollLeft,
+			y:  ref.current.scrollTop,
+		})
+	}
+  
+	element.addEventListener('scroll', handleScroll, { passive:  true });
+	return () => {
+		element.removeEventListener('scroll', handleScroll);
+	}
+}, [ref])
+  
+return [ref, state];
+}
+  
+export  default  useScroll;
+```
+useState를 사용해 useScroll에서 사용할 상태를 정의한다. 여기서는 스크롤의 x 좌표와 y 좌표로 정의했다. useEffect 내부에서 useScroll을 사용할 DOM 요소를 가져오고 이벤트 핸들러 함수를 정의한다. 해당 요소에 스크롤 이벤트 리스너를 등록하면 스크롤 위치 값을 사용할 수 있다. 
+스크롤 이벤트가 발생하면 reflow가 발생한다. reflow는 브라우저의 렌더링 과정에서 많은 비용을 사용하기 때문에 최적화가 필요하다. useScroll 훅을 최적화 할 수 있는 방법으로는 
+1. 이벤트 리스너 옵션으로 _passive: true_ 를 설정한다. 
+	크롬 브라우저의 경우 렌더러 프로세스가 탭 내의 웹 컨텐츠를 처리한다고 한다. 렌더러 프로세스는 다음의 과정을 통해 화면을 그린다.
+	![pipeline](https://i0.wp.com/amati.io/wp-content/uploads/2019/05/frame-full.jpg?resize=768%2C117&ssl=1)  
+	간단하게 DOM, CSSOM 트리를 구성하고 렌더 트리를 구성한 후 레이아웃 트리를 생성한다. 여기까지는 메인 스레드에서 실행하고 생성된 레이아웃 트리를 컴포지터 스레드에 넘긴다. 컴포지터 스레드에서는 실제로 요소를 화면에 그리는 작업을 수행한다.   
+	자바스크립트에 _addEventListener()_ 를 통해 등록된 이벤트는 컴포지터 스레드가 받는다. 이벤트가 들어오면 컴포지터 스레드는 메인 스레드에 이벤트를 넘기고 렌더링 파이프라인에 따라 layout, paint 과정을 거쳐 레이아웃 트리를 기다린다. 이 때 _passive: true_ 옵션을 설정하면 메인 스레드에 이벤트를 넘기지만, 처리를 기다리지 않고 바로 합성을 수행한다. 그렇기 때문에 스크롤 이벤트 성능이 향상된다.
+2. requestAnimationFrame 함수를 사용한다.
+	requestAnimationFrame 함수는 화면 주사율에 맞게 콜백 함수를 실행한다고 한다. 그렇기 때문에 불필요한 호출이 줄어들기 때문에 최적화가 가능하다.
+
+## 정리
+오늘은 브라우저의 렌더링 과정을 공부하는데 많은 시간을 투자한 것 같다. 그런데 투자한 시간 대비 머릿속에 남는 지식은 거의 없는 것 같다. 잘 모르는 개념이기도 하고, 알아야 할 것도 많다 보니 머릿속에서 정리가 잘 안되는 느낌이다. 이번 주 주말까지 브라우저 렌더링 과정을 정리하는 게 목표다.
+
+## 참고자료
+프로그래머스 데브코스  
+https://brunch.co.kr/@ebprux/45   
+https://velog.io/@giriboy/%EB%A0%8C%EB%8D%94%EB%9F%AC%ED%94%84%EB%A1%9C%EC%84%B8%EC%8A%A4-%EB%82%B4%EB%B6%80-%EB%8F%99%EC%9E%91  
+https://velog.io/@gygy/reflow-repaint  
+https://velog.io/@heelieben/JavaScript-Reflow-%EB%9E%80-feat.-%EB%B8%8C%EB%9D%BC%EC%9A%B0%EC%A0%80-%EB%A0%8C%EB%8D%94%EB%A7%81  
+https://junilhwang.github.io/TIL/Javascript/Design/Vanilla-JS-Virtual-DOM/  
+https://amati.io/eventlisteneroptions-passive-true/  
+https://jbee.io/web/optimize-scroll-event/  
+https://webisfree.com/2020-03-19/[%EC%9E%90%EB%B0%94%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8]-requestanimationframe()%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%98%EB%8A%94-%EB%B0%A9%EB%B2%95-%EB%B0%8F-%EC%98%88%EC%A0%9C
