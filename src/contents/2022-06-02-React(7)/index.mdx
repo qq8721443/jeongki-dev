@@ -1,0 +1,241 @@
+---
+title: "[데브코스] 54일차 TIL (React)"
+description: 사용자 정의 훅 만들기
+tag: [데브코스, 공부, TIL, javascript, React]
+date: 2022-06-02
+---
+
+
+## 들어가며
+오늘은 여러 가지 사용자 정의 훅을 만들어 보았다. 강의 앞부분에 해당 사용자 정의 훅이 어떤 동작을 하는지에 대한 설명을 듣고 먼저 만들어 보고, 강의에서는 어떤 방식으로 구현했는지 비교해보면서 공부했다. 반복해서 만들다 보니 어떤 식으로 구성해야 할 지 조금씩 감이 잡히는 것 같다. 
+
+## useResize
+지정한 대상 요소의 크기가 변경되었을 때 이벤트를 실행하는 훅이다. 처음에는 _resize_ 이벤트를 사용해 구현하려고 했다. 그런데 동작을 안하길래 찾아보니 _resize_ 이벤트는 window 객체에서만 발생한다고 한다. 모든 요소의 _resize_ 이벤트를 감지하기 위해 **Resize Observer**를 사용할 수 있다.  
+```javascript
+const observer = new ResizeObserver(callback);
+```
+_ResizeObserver_ 생성자 함수를 사용해 observer 객체를 생성할 수 있다. 전체적인 사용법은 **Intersection Observer**와 같다. 콜백 함수는 _entries_, _observer_ 를 매개변수로 받는다. entries는 ResizeObserverEntry 인스턴스의 배열이다. 해당 인스턴스는 아래의 속성들을 가지고 있다.
+- contentRect: 관찰 대상의 사각형 정보
+- target: 관찰 대상 요소
+- contentBoxSize: 관찰 대상의 _content-box_ 크기
+- borderBoxSize: 관찰 대상의 _border-box_ 크기
+
+observer는 자기 자신(ResizeObserver)을 참조하고 있다.  
+```javascript
+import { useCallback, useEffect, useRef, useState } from  "react";
+  
+const useResize = (handler) => {
+	const savedHandler = useRef(handler);
+	const targetRef = useRef(null);
+	  
+	useEffect(() => {
+		const element = targetRef.current;
+		if (!element) return;
+		  
+		const observer = new ResizeObserver(entries => {
+			savedHandler.current(entries[0].contentRect)
+		})
+		observer.observe(element);
+		  
+		return () => {
+			observer.disconnect();
+		}
+	}, [targetRef])
+	  
+	return targetRef;
+}
+  
+export default useResize;
+```
+useRef를 사용해 관찰하고자 하는 요소의 값을 가져온다. 관찰할 요소가 하나이기 때문에 ResizeObserver 콜백 함수에서 entries의 0번째 요소를 가져온다. 
+
+## useLocalStorage / useSessionStorage
+브라우저의 저장소를 사용할 수 있게 해주는 훅이다. 강의를 안보고 혼자서 한 번 만들어 봤는데 전체적인 구조가 같았다. 
+```javascript
+import { useState } from  "react";
+  
+const  useStorage = (type, key, initialValue) => {
+	// type: local, session
+	const  storage = type === 'local' ? localStorage : sessionStorage;
+	const [state, setState] = useState(() => {
+		try {
+			const  item = storage.getItem(key);
+			return  item ? JSON.parse(item) : initialValue;
+		} catch(e) {
+			console.error(e);
+			return  initialValue;
+		}
+	});
+	  
+	const setStorage = (value) => {
+		try {
+			storage.setItem(key, JSON.stringify(value));
+			setState(value);
+		} catch(e) {
+			console.error(e);
+		}
+	}
+	  
+	return [state, setStorage];
+}
+  
+export default useStorage;
+```
+강의에서는 localStorage와 sessionStorage를 사용하는 훅을 따로 만들었는데, 이름만 다르고 사용법은 같기 때문에 하나의 훅으로 만들고 type을 전달하도록 만들어 보았다. useState를 사용해 해당 훅 내부에서 사용할 상태 변수를 설정해준다. 이 값은 로컬 저장소에 저장된 값이 있으면 그 값을 초기값으로 설정하고, 만약 값이 없다면 전달 받은 매개변수를 초기값으로 설정한다.   
+신기한 점이 있는데 useState 내에 초기값을 함수로 전달하고 있다. 이를 **Lazy Initial State** 라고 한다. 만약 초기값을 설정할 때 복잡한 연산의 결과로 얻은 값을 전달한다고 가정하자. 
+```javascript
+const [state, setState] = useState(someExpensiveComputation())
+```
+이렇게 계산된 결과를 전달하게 되면 값은 초기화 과정에서 한 번만 적용되고 리렌더링시에는 적용되지 않지만, 함수는 계속해서 호출되기 때문에 성능에 낭비가 생긴다. 이를 해결하기 위해서 함수를 전달한다. 함수를 전달하면 처음 렌더링 할 때만 반환값을 초기값으로 설정하고, 리렌더링시에는 어떠한 계산도 하지 않는다.
+```javascript
+const [state, setState] = useState(() => {
+	return someExpensiveComputation();
+})
+```
+
+## useForm
+Form을 관리하기 위한 훅이다. Form은 데이터를 전송하기 위해 사용한다. Form에는 입력 받는 데이터가 있고, 해당 데이터의 유효성을 검사하고, 에러를 출력하고, 데이터를 전송하는 기능이 있다. 이런 기능들은 다양한 Form에서 공통적으로 사용하기 때문에 훅으로 만들어 관리하면 편하다. 이를 위한 Formik 이라는 라이브러리도 사용할 수 있다고 한다.
+```javascript
+import { useState } from  "react";
+
+const  useForm = ({ initialValues, onSubmit, validate }) => {
+	const [values, setValues] = useState(initialValues);
+	const [errors, setErrors] = useState({});
+	const [isLoading, setIsLoading] = useState(false);
+	  
+	const  handleChange = (e) => {
+		const { name, value } = e.target;
+		setValues({
+			...values,
+			[name]:  value
+		})
+	}
+	  
+	const  handleSubmit = async (e) => {
+		setIsLoading(true);
+		e.preventDefault();
+		const newErrors = validate ? validate(values) : {};
+		if (Object.keys(newErrors).length === 0) {
+			await onSubmit(values);
+		}
+		setErrors(newErrors);
+		setIsLoading(false);
+	}
+	  
+	return {
+		values,
+		errors,
+		isLoading,
+		handleChange,
+		handleSubmit
+	}
+}
+  
+export default useForm;
+```
+
+## useTimeout
+setTimeout을 시작하고 중단할 수 있는 훅이다. 구조는 간단하다.
+```javascript
+import { useCallback, useEffect, useRef } from  "react";
+  
+const useTimeoutFn = (fn, ms) => {
+	const timeoutId = useRef();
+	const callback = useRef(fn);
+	  
+	useEffect(() => {
+		callback.current = fn;
+	}, [fn]);
+	  
+	const run = useCallback(() => {
+		timeoutId.current && clearTimeout(timeoutId.current);
+		  
+		timeoutId.current = setTimeout(() => {
+			callback.current();
+		}, ms);
+	}, [ms])
+	  
+	const clear = useCallback(() => {
+		timeoutId.current && clearTimeout(timeoutId.current);
+	}, [])
+	  
+	useEffect(() => {
+		clear()
+	}, [clear])
+	  
+	return [run, clear]
+}
+  
+export  default  useTimeoutFn;
+```
+useRef를 사용해 setTimeout 함수의 id를 관리한다. run 함수에서는 setTimeout 함수를 실행하고, clear 함수에서는 clearTimeout 함수를 실행한다. 
+
+## useInterval
+useInterval 훅도 useTimeout 훅과 같다. setTimeout, clearTimeout 대신 setInterval, clearInterval 함수를 사용한다.
+```javascript
+import { useCallback, useEffect, useRef } from  "react";
+  
+const  useIntervalFn = (fn, ms) => {
+	const  intervalId = useRef();
+	const  callback = useRef(fn);
+	  
+	useEffect(() => {
+		callback.current = fn;
+	}, [fn]);
+	  
+	const  run = useCallback(() => {
+		intervalId.current && clearInterval(intervalId.current);
+		  
+		intervalId.current = setInterval(() => {
+			callback.current();
+		}, ms);
+	}, [ms])
+	  
+	const  clear = useCallback(() => {
+		intervalId.current && clearInterval(intervalId.current);
+	}, [])
+	  
+	useEffect(() =>  clear, [clear]);
+	  
+	return [run, clear];
+}
+  
+export  default  useIntervalFn;
+```
+
+## useDebounce
+디바운싱을 위해 사용하는 훅이다. 
+```javascript
+import { useEffect } from  "react";
+import  useTimeoutFn  from  "./useTimeoutFn"
+  
+const  useDebounce = (fn, ms, deps) => {
+	const [run, clear] = useTimeoutFn(fn, ms);
+	  
+	//eslint-disable-next-line
+	useEffect(run, deps);
+	  
+	return  clear;
+}
+  
+export  default  useDebounce;
+```
+기존에 만들었던 useTimeout 훅을 사용한다. useDebounce 훅 내의 useTimeout 훅의 run 함수가 실행되면 기존의 setTimeout 함수는 사라지기 때문에 자연스럽게 디바운스 효과를 낼 수 있다. 
+
+## 정리
+훅을 만들어 재사용하면 확실히 엄청 편할 것 같다. 지금은 사용자 정의 훅을 만드는 강의를 듣기 때문에 쉽다고 느껴지는 것 같은데, 실제 프로젝트를 진행하면서 중복되는 부분을 훅으로 만들어 사용할 수 있을지는 의문이다. 
+
+## TMI
+TIL은 12시 조금 넘어서 작성을 했다. mdx 파일을 생성하고 블로그 레포지토리에 변경사항을 반영했다. netlify로 배포하고 있어서 자동으로 빌드가 되는데 아무리 기다려도 빌드가 안되는 거다. 뭐가 문제인가 싶어서 netlify 오류 로그를 확인해 봤는데 다음과 같은 오류 때문에 빌드가 실패하고 있었다. 
+```
+Failed during stage 'building site': Build script returned non-zero exit code: 1
+```
+관련해서 구글링 해봤는데 다양한 원인이 있었다. 일단은 이전에 빌드가 제대로 됐던 커밋으로 다시 되돌리고 빌드를 해 보았다. 분명 이전에는 빌드가 잘 됐던 파일인데, 다시 빌드해보니 똑같은 오류와 함께 빌드가 안된다. 미치겠다. 제대로 배포가 됐을 때의 빌드 로그와 오류가 났던 빌드 로그를 비교해 보았다. 제대로 빌드가 됐을 때는 _16.15.0_ 버전의 node를 사용하고 있었고, 실패 했을 때에는 16.15.1 버전을 사용하고 있었다. 그래서 netlify 내부적으로 사용하는 node 버전을 변경하는 법에 대해 찾아보았다. [netlify 문서](https://docs.netlify.com/configure-builds/manage-dependencies/) 에서 잘 설명하고 있는데 환경 변수로 _NODE_VERSION_ 이라는 변수를 설정하고 값으로는 원하는 node 버전을 명시해주면 된다고 한다. 버전 명시하니까 제대로 빌드가 된다... 버전이 갑자기 왜 바뀐걸까..? 버전의 중요성을 깨닫는 하루였다. 오늘 일찍 잘 생각에 싱글벙글 하고 있었는데...
+
+
+## 참고자료
+프로그래머스 데브코스  
+https://heropy.blog/2019/11/30/resize-observer/  
+https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver  
+https://reactjs.org/docs/hooks-reference.html#lazy-initial-state  
+https://stackoverflow.com/questions/58539813/lazy-initial-state-what-it-is-and-how-to-use-it  
