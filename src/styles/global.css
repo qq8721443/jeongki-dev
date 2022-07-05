@@ -8,10 +8,6 @@
   -ms-overflow-style: none;
 }
 
-/* ::-webkit-scrollbar {
-  display: none;
-} */
-
 html,
 body {
   background-color: var(--bgcolor);
