@@ -89,6 +89,21 @@ export function Em(props) {
   );
 }
 
+export function Highlight({ children, ...props }) {
+  return (
+    <span
+      {...props}
+      style={{
+        padding: "0.15rem 0.5rem",
+        backgroundColor: "#646464",
+        borderRadius: "4px",
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
 export function Img(props) {
   return <img {...props} style={{ backgroundColor: "#fff" }} />;
 }

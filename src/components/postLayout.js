@@ -85,6 +85,7 @@ export default function DetailPage({ data }) {
             ul: MDXDesign.Ul,
             em: MDXDesign.Em,
             li: MDXDesign.Li,
+            inlineCode: MDXDesign.Highlight,
             // img: MDXDesign.Img,
           }}
         >
