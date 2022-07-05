@@ -1,0 +1,90 @@
+---
+title: "[데브코스] 77일차 TIL (데이터 시각화)"
+description: 데이터 시각화(2)
+tag: [데브코스, 공부, 시각화]
+date: 2022-07-05
+---
+
+## 들어가며
+
+오늘은 `D3.js` 라이브러리 강의를 들었다. D3는 **Data-Driven Documents** 라는 의미로, 데이터를 기반으로 문서를 조작할 수 있는 자바스크립트 라이브러리라고 한다. 내부적으로 HTML, CSS, SVG 등의 웹 표준을 기반으로 만들어졌기 때문에 다양한 모던 브라우저에서 사용할 수 있다. D3에서 DOM을 조작하기 위해 직접 만든 `Selection` 이라는 객체를 사용한다. Selection 객체는 `groups` 와 `parents` 를 매개변수로 받는다. **groups**는 HTML 요소들을 배열로 묶어 놓은 값, **parents**는 Selection 객체가 생성될 때의 부모 요소이다.
+
+## Selection
+
+selection 객체는 DOM 조작에 필요한 다양한 메서드를 제공한다.
+
+- **d3.select(selector)**  
+  DOM 요소를 찾을 때 사용한다. 매개변수로 HTML 요소를 직접 지정하거나 선택자를 넣을 수 있다. 일치하는 요소가 있으면 첫 번째 요소로 selection 객체를 구성하고, 일치하는 요소가 없으면 빈 배열로 selection 객체를 구성한다.
+- **d3.selectAll(selector)**  
+  select와 비슷하지만 selectAll은 일치하는 모든 요소를 selection 객체로 구성한다.
+- **selection.text([value])**  
+  selection이 가리키는 요소들의 텍스트를 가져온다. 매개변수로 값을 전달하면 해당 요소의 텍스트를 전달한 값으로 수정한다.
+- **selection.attr(name[,value])**  
+  selection이 가리키는 요소의 속성을 가져온다. 속성명 외에 값을 전달하면 해당 요소의 속성을 전달한 값으로 변경한다.
+- **selection.style(name, value)**  
+  selection이 가리키는 요소의 스타일을 설정한다.
+- **selection.classed(className[,value])**  
+  className을 전달해 selection이 가리키는 요소가 해당 클래스를 가지고 있는지 확인한다. 일치하는 클래스가 있다면 `true` 를 반환한다. 만약 추가로 value에 true 또는 false를 전달하면 아래와 같이 동작한다.
+  - value가 true 일 때, Selection 이 가리키는 요소에 클래스를 할당하고,
+  - value가 false 일 때는 클래스를 삭제한다.
+- **selection.append(type)**  
+  selection이 가리키는 요소에 자식 요소를 추가한다.
+- **selection.remove()**  
+  selection이 가리키는 요소를 DOM에서 삭제한다.
+- **selection.insert(type[, before])**  
+  `selection.append` 와 같이 selection이 가리키는 요소에 자식 요소를 추가한다. 매개변수로 type만 전달하면 append와 완전히 똑같이 동작한다. 만약 두 번째 인자로 선택자를 전달하면 해당 선택자와 일치하는 요소의 바로 앞에 자식 요소를 추가한다.
+- **selection.clone([deep])**  
+  selection의 모든 요소를 복제하고 해당 요소 바로 뒤에 붙여 넣는다. 매개변수로 `true` 값을 전달하면 하위 요소들까지 전부 복제한다.
+- **selection.raise()**  
+  selection의 요소를 해당 부모의 마지막 자식 요소로 다시 삽입한다.
+- **selection.lower()**  
+  selection의 요소를 해당 부모의 첫 번째 자식 요소로 다시 삽입한다.
+- **selection.sort(compareFunction)**  
+  selection 요소들의 위치를 compare function을 기반으로 변경한다. 자바스크립트 `sort` 함수처럼 함수를 직접 정의할 수도 있고, D3에서 제공하는 비교자들을 사용할 수도 있다.
+  > d3.ascending, d3.descending
+- **selection.node()**  
+  selection의 요소 중 첫 번째 요소를 반환한다.
+- **selection.nodes()**  
+  selection의 요소 전체를 반환한다.
+- **selection.call(function[, arguments...])**  
+  함수를 전달해 실행한다. 이 때, 함수는 딱 한 번만 실행되고, 함수에 필요한 인자를 매개변수로 전달할 수 있다. 이 때 전달하는 함수는 첫 번째 매개변수로 무조건 selection 객체를 전달 받는다.
+
+  ```javascript
+  function test(test1, test2) {
+    console.log("안녕 " + test1);
+    console.log("안녕 " + test2);
+  }
+
+  d3.select(selector).call(test, "첫 번째 인자", "두 번째 인자");
+  ```
+
+  위와 같이 `test` 함수를 정의했을 때 나는 `안녕 첫 번째 인자`, `안녕 두 번째 인자` 순서로 출력이 될 것이라고 생각했다. 그러나 call 메서드에 전달하는 함수의 첫 번째 인자는 selection 객체이기 때문에 실제로는 `안녕 [object Object]`, `안녕 첫 번째 인자` 순서로 출력이 된다. 따라서 위의 `test` 함수를 아래와 같이 변경해야 한다.
+
+  ```javascript
+  function test(selection, test1, test2) {
+    console.log("안녕 " + test1);
+    console.log("안녕 " + test2);
+  }
+  ```
+
+## 궁금했던 것
+
+강의에서 다루지는 않았지만 강의 코드중에 `selection.data()` 메서드를 사용해 selection의 요소와 데이터를 연결하는 코드가 있었다. 이 코드 다음에는 `selection.enter()` 가 항상 붙어있었다.
+
+```javascript
+const barGroup = d3.select('#bargraph').append('g');
+
+barGroup.selectAll('rect')
+	.data(dataset)
+	.enter()
+	.append('rect')
+	... // 후략
+```
+
+이 코드를 처음 보고 당황했다. `selectAll` 을 사용해 `rect` 요소를 가져오는데 dataset을 바인딩 하고 그 뒤에 다시 `rect` 요소를 `append` 해주고 있다. HTML 파일에는 `barGroup` 내에 `rect` 요소가 없다. 그럼에도 이렇게 코드를 작성한 이유는 D3 라이브러리의 철학 때문이라고 한다. **Data-Driven Documents** 라는 이름에 맞게 데이터를 기반으로 화면을 그려주는 것이다. 만약 미리 정의된 DOM 요소에만 데이터를 바인딩 할 수 있다면 그건 D3의 철학에 어긋나는 것 같다. 그렇기 때문에 요소가 없어도 `selectAll` 로 selection 객체를 만들고 데이터를 연결한 후 `enter` 와 `append` 메서드를 사용해 아직 바인딩 되지 않은 데이터를 위한 작업을 진행하는 것이다. 오늘은 D3 강의 첫 날이라 관련된 내용은 나중 강의에서 알려주지 않을까 기대하고 있다.
+
+## 참고자료
+
+프로그래머스 데브코스  
+https://github.com/d3/d3-selection  
+https://frhyme.github.io/others/enter_exit_in_d3/
