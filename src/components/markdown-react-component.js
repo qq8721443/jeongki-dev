@@ -95,7 +95,7 @@ export function Highlight({ children, ...props }) {
       {...props}
       style={{
         padding: "0.15rem 0.5rem",
-        backgroundColor: "#646464",
+        backgroundColor: "var(--post-em-back-color)",
         borderRadius: "4px",
       }}
     >
