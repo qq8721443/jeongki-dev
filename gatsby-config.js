@@ -42,7 +42,7 @@ module.exports = {
         gatsbyRemarkPlugins: [
           {
             resolve: `gatsby-remark-images`,
-          }
+          },
         ],
       },
     },
@@ -53,7 +53,6 @@ module.exports = {
         showSpinner: false,
       },
     },
-    "gatsby-remark-reading-time",
     "prism-react-renderer",
   ],
 };

@@ -64,7 +64,6 @@ export default function DetailPage({ data }) {
           }}
         >
           <div>{data.mdx.frontmatter.date}</div>
-          <div>{data.mdx.fields.readingTime.text}</div>
         </div>
       </div>
       <main
@@ -114,9 +113,6 @@ export const query = graphql`
       body
       fields {
         slug
-        readingTime {
-          text
-        }
       }
     }
   }
